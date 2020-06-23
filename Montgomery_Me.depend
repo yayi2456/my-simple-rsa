@@ -1,15 +1,16 @@
 # depslib dependency file v1.0
-1587812776 source:d:\languages\codeblocks\montgomery_me\main.cpp
+1592939759 source:d:\languages\codeblocks\montgomery_me\main.cpp
 	<iostream>
 	"simpleBigint.h"
-	"simplemontgomery.h"
+	"simpleMontgomery.h"
 	"simpleRSA.h"
-	"threadModexp.h"
+	"crtRSA.h"
 	"severalMsgRSA.h"
 	<time.h>
-	"multiThreadModexp.h"
+	<Windows.h>
+	"layersModexpOpenCL.h"
 
-1587805496 d:\languages\codeblocks\montgomery_me\simplebigint.h
+1592834803 d:\languages\codeblocks\montgomery_me\simplebigint.h
 	<vector>
 	<iostream>
 	<string>
@@ -18,16 +19,16 @@
 	<math.h>
 	<pmmintrin.h>
 
-1587636342 source:d:\languages\codeblocks\montgomery_me\simplemontgomery.cpp
+1592939735 source:d:\languages\codeblocks\montgomery_me\simplemontgomery.cpp
 	"simplemontgomery.h"
 
-1587807568 source:d:\languages\codeblocks\montgomery_me\simplebigint.cpp
+1592841618 source:d:\languages\codeblocks\montgomery_me\simplebigint.cpp
 	"simpleBigint.h"
 
-1587631005 d:\languages\codeblocks\montgomery_me\simplemontgomery.h
+1592924581 d:\languages\codeblocks\montgomery_me\simplemontgomery.h
 	"simpleBigint.h"
 	<math.h>
-	<pmmintrin.h>
+	<immintrin.h>
 	<cstring>
 	<windows.h>
 
@@ -42,8 +43,11 @@
 1587650522 source:d:\languages\codeblocks\montgomery_me\threadmodexp.cpp
 	"threadModexp.h"
 
-1587653333 d:\languages\codeblocks\montgomery_me\simplersa.h
+1592845785 d:\languages\codeblocks\montgomery_me\simplersa.h
 	"simpleModexp.h"
+	"layersModexp.h"
+	"threadLayerModexp.h"
+	"quickModexp.h"
 
 1587650045 d:\languages\codeblocks\montgomery_me\simplemodexp.h
 	"simpleBigint.h"
@@ -52,7 +56,7 @@
 1587650079 source:d:\languages\codeblocks\montgomery_me\simplemodexp.cpp
 	"simpleModexp.h"
 
-1587653719 source:d:\languages\codeblocks\montgomery_me\simplersa.cpp
+1592845890 source:d:\languages\codeblocks\montgomery_me\simplersa.cpp
 	"simpleRSA.h"
 
 1587537860 d:\languages\codeblocks\montgomery_me\threadmontgomery.h
@@ -79,4 +83,66 @@
 
 1587828564 source:d:\languages\codeblocks\montgomery_me\multithreadmodexp.cpp
 	"multiThreadModexp.h"
+
+1592814483 d:\languages\codeblocks\montgomery_me\layersmodexp.h
+	"simpleBigint.h"
+	"simpleMontgomery.h"
+	<stdlib.h>
+	<algorithm>
+	<vector>
+
+1592814480 source:d:\languages\codeblocks\montgomery_me\layersmodexp.cpp
+	"layersModexp.h"
+
+1592940203 source:d:\languages\codeblocks\montgomery_me\crtrsa.cpp
+	"crtRSA.h"
+
+1592940232 d:\languages\codeblocks\montgomery_me\crtrsa.h
+	"layersModexp.h"
+	"quickModexp.h"
+	<omp.h>
+
+1592826346 d:\languages\codeblocks\montgomery_me\layersmodexpopencl.h
+	<stdio.h>
+	<stdlib.h>
+	<CL/cl.h>
+
+1579690210 d:\library_cpp\opencl_intel_sdk\system_studio_2020\opencl\sdk\include\cl\cl.h
+	<CL/cl_version.h>
+	<CL/cl_platform.h>
+
+1579690210 d:\library_cpp\opencl_intel_sdk\system_studio_2020\opencl\sdk\include\cl\cl_version.h
+
+1579690210 d:\library_cpp\opencl_intel_sdk\system_studio_2020\opencl\sdk\include\cl\cl_platform.h
+	<CL/cl_version.h>
+	<stdint.h>
+	<stddef.h>
+	<altivec.h>
+	<intrin.h>
+	<xmmintrin.h>
+	<intrin.h>
+	<emmintrin.h>
+	<mmintrin.h>
+	<intrin.h>
+	<immintrin.h>
+
+1592822117 source:d:\languages\codeblocks\montgomery_me\layersmodexpopencl.cpp
+	"layersModexpOpenCL.h"
+
+1592843260 source:d:\languages\codeblocks\montgomery_me\threadlayermodexp.cpp
+	"threadLayerModexp.h"
+
+1592843223 d:\languages\codeblocks\montgomery_me\threadlayermodexp.h
+	"simpleBigint.h"
+	"simpleMontgomery.h"
+	<stdlib.h>
+	<algorithm>
+	<vector>
+
+1592939326 d:\languages\codeblocks\montgomery_me\quickmodexp.h
+	"simpleBigint.h"
+	"simplemontgomery.h"
+
+1592931793 source:d:\languages\codeblocks\montgomery_me\quickmodexp.cpp
+	"quickModexp.h"
 

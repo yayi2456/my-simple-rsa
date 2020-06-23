@@ -6,7 +6,7 @@ prime1 是n的素数因子p。
 prime2 i是n的素数因子q。
 exponent1 等于d mod (p − 1)。
 exponent2 等于d mod (q − 1)。
-coefficient 是CRT系数 q–1 mod p。
+coefficient 是CRT系数 q^(–1) mod p。
 -----------------------------------------------------
 
 OpenSSL> rsa -text -in private.key

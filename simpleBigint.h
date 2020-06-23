@@ -23,6 +23,7 @@ class SimpleBigint{
     SimpleBigint(const SimpleBigint&bigint);
     SimpleBigint(const uint64_t num,unsigned mulsize);
     SimpleBigint(uint32_t*num,unsigned from,unsigned to):numbers(num+from,num+to){}
+    SimpleBigint(void*);
     void getfromString(string num);
     void getfromuint32(const uint32_t num,unsigned mulsize);
     SimpleBigint& operator=(const SimpleBigint& bigint);

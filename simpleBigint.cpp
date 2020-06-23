@@ -18,7 +18,19 @@ SimpleBigint::SimpleBigint(const uint64_t num,unsigned mulsize){
     numbers.push_back(lowbits);
     if(highbits)numbers.push_back(highbits);
 }
-
+SimpleBigint::SimpleBigint(void*num){
+    uint32_t lengthme;
+    memcpy(&lengthme,num,sizeof(uint32_t));
+    //cout<<"SIMPLEBIGINT-length="<<lengthme<<endl;
+    int position=sizeof(uint32_t);
+    for(int i=0;i<(int)lengthme;++i){
+        int tmp;
+        memcpy(&tmp,num+position,sizeof(uint32_t));
+        numbers.push_back(tmp);
+        position+=sizeof(uint32_t);
+        //cout<<"SIMPLEBIGINT-tmp"<<i<<"/"<<lengthme<<" ="<<tmp<<endl;
+    }
+}
 
 void SimpleBigint::getfromString(string num){
     numbers.clear();

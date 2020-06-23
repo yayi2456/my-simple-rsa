@@ -3,7 +3,7 @@
 
 #include"simpleBigint.h"
 #include<math.h>
-#include <pmmintrin.h>
+#include <immintrin.h>
 #include<cstring>
 #include<windows.h>
 //R=(2^32)^M，M=B.size()-1，（如果要分解B的话，我们就分解B）
@@ -44,11 +44,9 @@ public:
     SimpleBigint myMontgomeryReduction(SimpleBigint ResR);
     //SIMD程序
     SimpleBigint simdMontgomeryMul(SimpleBigint&AR, SimpleBigint&BR);
+    SimpleBigint simdMontgomeryMul_avx256(SimpleBigint&AR, SimpleBigint&BR);
 
 };
-#define TSIZE 32
-
-extern vector<double> timeintervels;
 //extern SimpleBigint R2modN;
 //n=2^32
 //a=x0
@@ -58,14 +56,4 @@ extern vector<double> timeintervels;
 uint32_t extendEuclideanx0_1_32(uint32_t x0);
 //修改版函数
 SimpleBigint simdMulBig_32(SimpleBigint X,uint32_t y0);
-                   //uint32_t*dest,uint32_t*bignum,uint32_t scalar,uint32_t length=TSIZE);//dest=dest+bignum*scalar
-//SimpleBigint AddBig_Big(SimpleBigint X,SimpleBigint Y);
-
-//SimpleBigint simpleMontgomeryMul(const SimpleBigint&AR,const SimpleBigint&BR,const SimpleBigint& N,unsigned length=TSIZE);
-//input:AR,Montgomery form A;BR,Montgomery form of B; N, modulo
-//return AR*BR*R^{-1} mod N
-//SimpleBigint simplemmulmod(const SimpleBigint&A,const SimpleBigint&B,const SimpleBigint&N,unsigned length=TSIZE);
-
-//SimpleBigint simd_mulmod(const SimpleBigint&A,const SimpleBigint&B,const SimpleBigint&N,unsigned length=TSIZE);
-
 #endif // _SIMPLE_MONTGOMERY_

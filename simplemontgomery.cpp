@@ -1,6 +1,8 @@
 #include"simplemontgomery.h"
 
 //#define _SIMPLE_MONTGOMERY_DEBUG
+//#define _SIMPLE_MONTGOMERY_DEBUG_AVX
+//#define _TIME_TEST_
 SimpleBigint R2modN;
 vector<double> timeintervels;
 
@@ -65,20 +67,6 @@ SimpleBigint MyMontgomery::calN_1(){
         else if(tfr_1.getbyIndex(0)%2!=1){
             t=0;
         }
-
-        /*while(tfr_1>np){
-            np+=p;
-        }//cout<<"find p"<<endl;
-        tfr_1=np-tfr_1;//cout<<"hhh"<<endl;
-        //tN=tfr_1 mod p;tN=tfr_1 mod 2;N is a prime,t \in [0,1]
-        if(tfr_1.numbersLength()<=0)t=0;//
-        else if(tfr_1.getbyIndex(0)%2!=0){
-            //奇数
-            t=1;
-        }
-        else if(tfr_1.getbyIndex(0)%2!=1){
-            t=0;
-        }*/
         //cout<<"tfr_1="<<tfr_1<<endl;
         if(t){
             rk=(rk+pk);
@@ -94,18 +82,6 @@ SimpleBigint MyMontgomery::calN_1(){
 }
 SimpleBigint MyMontgomery::myMontgomeryTo(bool isA){
     //S=REDC((a mod N)*(R^2 mod N))
-/*    SimpleBigint TmodN,REDCT;
-    if(isA)TmodN=A%N;
-    else TmodN=B%N;
-    //cout<<"TmodN="<<TmodN<<endl;
-    REDCT=(R2modN*TmodN)%N;
-    //cout<<"REDCT="<<REDCT<<endl;
-    //SimpleBigint S;
-    //S=simpleMontgomeryReduction(REDCT,N);
-    SimpleBigint R(1,TSIZE-1);
-    SimpleBigint S((R*T)%N);
-    //cout<<"to m form"<<":T="<<T<<",TR="<<S<<endl;
-    return S;*/
     SimpleBigint m,t;
     SimpleBigint tmp;
     if(isA)tmp=A%N;
@@ -168,7 +144,6 @@ SimpleBigint MyMontgomery::myMontgomeryReduction( SimpleBigint ResR){
     #ifdef _DEBUG
     cout<<"t="<<t<<endl;
     #endif
-
     if(t>=N)return t-N;
     return t;
 }
@@ -282,7 +257,193 @@ SimpleBigint MyMontgomery::simdMontgomeryMul(SimpleBigint&AR, SimpleBigint&BR){
         #endif
         d0=D.getbyIndex(0);
     }
+    D.trimnumber();
+    if(N>D)return D;
+    else return D-N;
+}
 
+
+///avx
+///256
+//用于计算X*y0
+SimpleBigint simdMulBig_32_256(SimpleBigint X,uint32_t y0){
+    unsigned xlength=X.numbersLength();
+    //将X做成128/32=4的整数个数据
+    unsigned zerosNeeded=4-xlength%4;
+    zerosNeeded==4?zerosNeeded=0:zerosNeeded=zerosNeeded;
+    for(int i=0;i<zerosNeeded;++i){
+        X.numbers.push_back(0);
+    }
+    xlength+=zerosNeeded;
+    #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+    cout<<"SIMD-AVX:X="<<X<<endl;
+    cout<<"y0="<<y0<<endl;
+    cout<<"xlength="<<xlength<<endl;
+    cout<<"zerosNeeded="<<zerosNeeded<<endl;
+    #endif
+    #ifdef _TIME_TEST_
+    long long head,freq,tail;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
+    //res
+    uint32_t*res1=(uint32_t*)malloc((xlength)*sizeof(uint32_t));
+    //进位数据
+    uint32_t*c_1=(uint32_t*)malloc((xlength+1)*sizeof(uint32_t));
+    memset(res1,0,(xlength)*sizeof(uint32_t));
+    memset(c_1,0,(xlength+1)*sizeof(uint32_t));
+    uint32_t extend_y0[8];
+    extend_y0[0]=extend_y0[2]=extend_y0[4]=extend_y0[6]=y0;
+    extend_y0[1]=extend_y0[3]=extend_y0[5]=extend_y0[7]=0;
+    uint64_t loadmask[4];
+    //只load低位数据
+    loadmask[0]=loadmask[1]=0xFFFFFFFFFFFFFFFF;
+    loadmask[2]=loadmask[3]=0;
+    __m256i loadmasklowbitonly=_mm256_loadu_si256((__m256i*)(loadmask));
+    uint64_t storemask[4];
+    storemask[0]=storemask[1]=0;
+    storemask[2]=storemask[3]=0xFFFFFFFFFFFFFFFF;
+    __m256i storemaskhighbitsonly=_mm256_loadu_si256((__m256i*)(storemask));
+    /*uint64_t loadmask0[4];
+    loadmask0[0]=loadmask0[1]=0;
+    loadmask0[2]=loadmask0[3]=0;*/
+    __m256i dxi,dy0,res256;
+    //__m128i resr,resc;//,resraddrescr,resraddrescc;
+    //__m256i allzero;
+    //allzero=_mm256_loadu_si256((__m256i*)(&loadmask0[0]));
+    /*uint32_t idx[8];
+    idx[0]=4;idx[1]=0;idx[2]=1;idx[3]=2;idx[4]=3;idx[5]=5;idx[6]=6;idx[7]=7;
+    __m256i idxchoose32t=_mm256_loadu_si256((__mm256i*)(&idx[0]));
+    uint64_t bitwiseand[4];
+    bitwiseand[0]=bitwiseand[1]=bitwiseand[2]=bitwiseand[3]=1;
+    __m256i all4ones=_mm256_loadu_si256((__mm256i*)(&bitwiseand[0]));*/
+    dy0=_mm256_loadu_si256((__m256i*)extend_y0);//0,y0,0,y0,0,y0,0,y0
+    for(unsigned i=0;i<xlength;i+=4){
+        //数据取入
+        //dxi=_mm256_loadu_si256((__m256i*)(&X.numbers[i]));//xx,xx,xx,xx,x3,x2,x1,x0
+        //dxi=_mm256_permute2f128_si256(dxi,allzero,0x20);//0,0,0,0,x3,x2,x1,x0
+        //dy0=_mm256_loadu_si256((__m256i*)extend_y0);//0,0,0,0,y0,y0,y0,y0
+        //dxi=_mm256_maskload_epi64((__int64*)(&X.numbers[i]),loadmasklowbitonly);//0,0,0,0,x3,x2,x1,x0
+        dxi=_mm256_loadu_si256((__m256i*)(&X.numbers[i]));//xx,xx,xx,xx,x3,x2,x1,x0
+        //dy0=_mm256_maskload_epi64((__int64*)(extend_y0),loadmasklowbitonly);
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        uint32_t tmp[4];
+        uint32_t tmp3[8];
+        _mm256_storeu_si256((__m256i*)tmp3,dxi);
+        cout<<"acutal dxi:"<<tmp3[7]<<" "<<tmp3[6]<<" "<<tmp3[5]<<" "<<tmp3[4]<<" "<<tmp3[3]<<" "<<tmp3[2]<<" "<<tmp3[1]<<" "<<tmp3[0]<<endl;
+        _mm256_storeu_si256((__m256i*)tmp3,dy0);
+        cout<<"acutal dy0:"<<tmp3[7]<<" "<<tmp3[6]<<" "<<tmp3[5]<<" "<<tmp3[4]<<" "<<tmp3[3]<<" "<<tmp3[2]<<" "<<tmp3[1]<<" "<<tmp3[0]<<endl;
+        #endif
+        dxi=_mm256_permute4x64_epi64(dxi,0xd8);//0,0,x3,x2,0,0,x1,x0
+        //dy0=_mm256_permute4x64_epi64(dy0,0xd8);
+        dxi=_mm256_shuffle_epi32(dxi,0xd8);//0,x3,0,x2,0,x1,0,x0
+        //dy0=_mm256_shuffle_epi32(dy0,0xd8);//0,y0,0,y0,0,y0,0,y0
+
+        res256=_mm256_mul_epu32(dxi,dy0);//c3,r3,c2,r2,c1,r1,c0,r0
+        res256=_mm256_shuffle_epi32(res256,0xd8);//c3,c2,r3,r2,c1,c0,r1,r0
+        res256=_mm256_permute4x64_epi64(res256,0xd8);//c3,c2,c1,c0,r3,r2,r1,r0
+
+        _mm256_maskstore_epi64((__int64*)(res1+i),loadmasklowbitonly,res256);//低位存储
+        _mm256_maskstore_epi64((__int64*)(c_1+i-3),storemaskhighbitsonly,res256);//高位存储
+        //resr=_mm256_extracti128_si256(res256,0x0);//r3,r2,r1,r0
+        //resc=_mm256_extracti128_si256(res256,0x1);//c3,c2,c1,c0
+        /*resr=_mm256_unpacklo(res256,allzero);//0,0,r3,r2,0,0,r1,r0
+        resr=_mm256_permute4x64_epi64(resr,0xd8);//0,0,0,0,r3,r2,r1,r0
+        resc=_mm256_unpackhi(res256,allzeor);//0,0,c3,c2,0,0,c1,c0
+        resc=_mm256_permute4x64_epi64(resc,0xd8);//0,0,0,0,c3,c2,c1,c0
+*/
+        //resc=_mm256_permutevar8x32_epi32(resc,idxchoose32t);//0,0,0,c3,c2,c1,c0,0
+        //计算加和
+        //resraddrescr=_mm256_add_epi64(resr,resc);//0,0,0,c3,rr3,rr2,rr1,rr0
+        //上述加和，高128位不可能进位，低128位，每64位可能存在一个进位，
+        //分析就可知，进位只可能是1或者0.
+        //如果是1，则rr*<c*且rr*<r*，
+        //如果rr*<c*或者rr*<r*，一定能够断定存在进位
+        //resraddrescc=_mm256_cmpgt_epi64(resr,resraddrescr);//如果存在进位，则那64bit全为1//0,0,cc1',cc0'
+        //resraddrescc=_mm256_and_si256(resraddrescc,all4ones);//如果有进位，对应的64bit低位是1//0,0,cc1,cc0
+        //resraddrescc=_mm256_permute4x64_epi64(resraddrescc,0xd2);//0,cc1,cc0,0
+        //现在应得到2*8个32bit的数据:C=0,0,0,cc1,0,cc2,0,0
+        //Res=0,0,0,c3,rr3,rr2,rr1,rr0
+        //实际上只要2*5个就可以了：C'=cc1,0,cc2,0,0; Res'=c3,rr3,rr2,rr1,rr0
+        //C已经移位妥当
+
+        //_mm_storeu_si128((__m128i*)(&res1[i]),resr);
+        //_mm_storeu_si128((__m128i*)(c_1+i+1),resc);
+
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        _mm256_maskstore_epi64((__int64*)(tmp),loadmasklowbitonly,res256);//低位存储
+        cout<<"resr:"<<tmp[3]<<" "<<tmp[2]<<" "<<tmp[1]<<" "<<tmp[0]<<endl;
+        _mm256_maskstore_epi64((__int64*)(tmp-4),storemaskhighbitsonly,res256);//高位存储
+        cout<<"resc:"<<tmp[3]<<" "<<tmp[2]<<" "<<tmp[1]<<" "<<tmp[0]<<endl;
+        uint32_t tmp2[8];
+        _mm256_maskstore_epi64((__int64*)(tmp2),loadmasklowbitonly,res256);//低位存储
+        cout<<"resr:"<<tmp2[7]<<" "<<tmp2[6]<<" "<<tmp2[5]<<" "<<tmp2[4]<<" "<<tmp2[3]<<" "<<tmp2[2]<<" "<<tmp2[1]<<" "<<tmp2[0]<<endl;
+        _mm256_maskstore_epi64((__int64*)(tmp2),storemaskhighbitsonly,res256);//高位存储
+        cout<<"resc:"<<tmp2[7]<<" "<<tmp2[6]<<" "<<tmp2[5]<<" "<<tmp2[4]<<" "<<tmp2[3]<<" "<<tmp2[2]<<" "<<tmp2[1]<<" "<<tmp2[0]<<endl;
+        _mm256_storeu_si256((__m256i*)tmp2,res256);
+        cout<<"acutal res256:"<<tmp2[7]<<" "<<tmp2[6]<<" "<<tmp2[5]<<" "<<tmp2[4]<<" "<<tmp2[3]<<" "<<tmp2[2]<<" "<<tmp2[1]<<" "<<tmp2[0]<<endl;
+        cout<<"end-"<<endl;
+        #endif
+    }
+    #ifdef _TIME_TEST_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000000.0/freq;
+    cout<<"in AVX, time used="<<intervel<<" us"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
+    //X被指为4的整数倍，不会有多余数据
+    SimpleBigint resme(res1,0,xlength),cme(c_1,0,xlength+1);
+    resme.trimnumber();cme.trimnumber();X.trimnumber();
+    SimpleBigint resres=resme+cme;
+    #ifdef _TIME_TEST_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000000.0/freq;
+    cout<<"in SIMPLE-ADD, time used="<<intervel<<" us"<<endl;
+    #endif
+    #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+    for(int i=0;i<xlength+1;++i){
+        cout<<res1[i]<<" ";
+    }cout<<endl;
+    for(int i=1;i<xlength+2;++i){
+        cout<<c_1[i]<<" ";
+    }cout<<endl;
+    cout<<"resme="<<resme<<",cme="<<cme<<endl;
+    cout<<"resres="<<resres<<endl;
+    #endif
+    free(res1);free(c_1);
+    return resres;
+}
+
+SimpleBigint MyMontgomery::simdMontgomeryMul_avx256(SimpleBigint&AR, SimpleBigint&BR){
+    SimpleBigint D;
+    const uint32_t ar0=AR.getbyIndex(0);
+    const uint32_t n0=N.getbyIndex(0);
+    uint32_t n0_1=extendEuclideanx0_1_32(n0);
+    uint32_t q=0,d0=0;
+    uint64_t tmp2=(UINT32_MAX-n0_1+1);
+    for(int i=0;i<R.numbersLength()-1;++i){
+        uint32_t bri=BR.getbyIndex(i);
+        D+=simdMulBig_32_256(AR,bri);
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        cout<<"AVX-256:("<<i<<"/"<<R.numbersLength()-1<<")"<<endl;
+        cout<<"bri="<<bri<<",AR*bri="<<(AR*bri)<<",D="<<D<<endl;
+        #endif
+        uint64_t tmp1=(d0+ar0*bri);
+        q=tmp1*tmp2;//需要取模
+        //SimpleBigint q(q0,0);
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        cout<<"tmp1="<<tmp1<<",tmp2="<<tmp2<<",q="<<q<<endl;
+        #endif
+        D+=simdMulBig_32_256(N,q);
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        cout<<"N*q="<<N*q<<",D="<<D<<endl;
+        #endif
+        D.shiftDivide32();
+        #ifdef _SIMPLE_MONTGOMERY_DEBUG_AVX
+        cout<<"D="<<D<<endl;
+        #endif
+        d0=D.getbyIndex(0);
+    }
     D.trimnumber();
     if(N>D)return D;
     else return D-N;
