@@ -1,5 +1,6 @@
 #include"crtRSA.h"
 //#define _CRT_RSA_DEBUG
+//#define _TEST_TIME_CRT_RSA
 /*
 openssl使用方式：https://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
 更多生成数据与说明参见文件others/openssl_rsadata.txt
@@ -106,6 +107,11 @@ SimpleBigint CrtRSA::encryptme_quick(SimpleBigint m){
     return qme.cmexp;
 }
 SimpleBigint CrtRSA::decryptme_quick(SimpleBigint c){
+    #ifdef _TEST_TIME_CRT_RSA
+    long long head,freq,tail;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     #ifndef _OPEN_OPENMP_
     SimpleBigint cp=c%p;
     SimpleBigint cq=c%q;
@@ -131,6 +137,12 @@ SimpleBigint CrtRSA::decryptme_quick(SimpleBigint c){
         }
     }
     #endif
+    #ifdef _TEST_TIME_CRT_RSA
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in crtRSA-decrypt-loop, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     SimpleBigint qmepbig=qmep.cmexp;
     //因为实现的大数类无法处理负数，
     //先把可能是负数的东西改成正数
@@ -139,6 +151,11 @@ SimpleBigint CrtRSA::decryptme_quick(SimpleBigint c){
     }
     SimpleBigint h=(((qmepbig-qmeq.cmexp))*q_1)%p;
     SimpleBigint m=(qmeq.cmexp+h*q)%n;
+    #ifdef _TEST_TIME_CRT_RSA
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000.0/freq;
+    cout<<"in crtRSA-decrypt-exit, time used="<<intervel<<" ms"<<endl;
+    #endif
     #ifdef _CRT_RSA_DEBUG
     cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
     cout<<"the cp="<<cp<<"\ncq="<<cq<<endl;

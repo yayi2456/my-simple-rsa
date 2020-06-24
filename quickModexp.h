@@ -2,6 +2,9 @@
 #define _QUICK_MOD_EXP
 #include"simpleBigint.h"
 #include"simplemontgomery.h"
+#include<omp.h>
+#define _TWO_TASKS_
+
 class QuickModExp{
 public:
     SimpleBigint cm;

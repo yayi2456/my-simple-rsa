@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1592939759 source:d:\languages\codeblocks\montgomery_me\main.cpp
+1592993570 source:d:\languages\codeblocks\montgomery_me\main.cpp
 	<iostream>
 	"simpleBigint.h"
 	"simpleMontgomery.h"
@@ -94,10 +94,10 @@
 1592814480 source:d:\languages\codeblocks\montgomery_me\layersmodexp.cpp
 	"layersModexp.h"
 
-1592940203 source:d:\languages\codeblocks\montgomery_me\crtrsa.cpp
+1592985205 source:d:\languages\codeblocks\montgomery_me\crtrsa.cpp
 	"crtRSA.h"
 
-1592940232 d:\languages\codeblocks\montgomery_me\crtrsa.h
+1592985530 d:\languages\codeblocks\montgomery_me\crtrsa.h
 	"layersModexp.h"
 	"quickModexp.h"
 	<omp.h>
@@ -139,10 +139,11 @@
 	<algorithm>
 	<vector>
 
-1592939326 d:\languages\codeblocks\montgomery_me\quickmodexp.h
+1592993879 d:\languages\codeblocks\montgomery_me\quickmodexp.h
 	"simpleBigint.h"
 	"simplemontgomery.h"
+	<omp.h>
 
-1592931793 source:d:\languages\codeblocks\montgomery_me\quickmodexp.cpp
+1592993867 source:d:\languages\codeblocks\montgomery_me\quickmodexp.cpp
 	"quickModexp.h"
 

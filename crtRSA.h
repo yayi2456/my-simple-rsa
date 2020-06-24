@@ -1,6 +1,6 @@
 #ifndef _CRT_RSA
 #define _CRT_RSA
-//#define _OPEN_OPENMP_
+#define _OPEN_OPENMP_
 #include"layersModexp.h"
 #include"quickModexp.h"
 #ifdef _OPEN_OPENMP_
