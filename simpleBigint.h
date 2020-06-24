@@ -7,7 +7,7 @@
 #include<iomanip>
 #include<math.h>
 #include <pmmintrin.h>
-
+#include"switches.h"
 //#define _DEBUG
 
 using namespace std;

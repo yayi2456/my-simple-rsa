@@ -84,8 +84,8 @@ SimpleBigint MyMontgomery::myMontgomeryTo(bool isA){
     //S=REDC((a mod N)*(R^2 mod N))
     SimpleBigint m,t;
     SimpleBigint tmp;
-    if(isA)tmp=A%N;
-    else tmp=B%N;
+    if(isA)tmp=A;//%N;
+    else tmp=B;//%N;
     SimpleBigint result,value=tmp*R2modN;
     //cout<<"change to M-form: "<<value<<endl;
     result=myMontgomeryReduction(value);

@@ -1,5 +1,6 @@
 #include"simpleRSA.h"
 //#define _SIMPLE_RSA_DEBUG
+#define _TEST_TIME_SIMPLE_RSA
 /*
 openssl使用方式：https://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
 更多生成数据与说明参见文件others/openssl_rsadata.txt
@@ -134,13 +135,24 @@ SimpleBigint SimpleRSA::encryptme_quick(SimpleBigint m){
     return qme.cmexp;
 }
 SimpleBigint SimpleRSA::decryptme_quick(SimpleBigint c){
+    #ifdef _TEST_TIME_SIMPLE_RSA
+    long long head,freq,tail;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     QuickModExp qme(c,d,n);
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"doning decrypt...\nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
+    #ifdef _TEST_TIME_SIMPLE_RSA
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in simplersa-quickmoe-init, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
     #endif
     qme.quickmodexp();
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"decrypt done with \nM="<<qme.cmexp<<endl;
+    #ifdef _TEST_TIME_SIMPLE_RSA
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000.0/freq;
+    cout<<"in simplersa-quickmod-mod, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
     #endif
     return qme.cmexp;
 }

@@ -3,7 +3,7 @@
 #include"simpleBigint.h"
 #include"simplemontgomery.h"
 #include<omp.h>
-#define _TWO_TASKS_
+//#define _TWO_TASKS_
 
 class QuickModExp{
 public:
@@ -20,8 +20,24 @@ public:
         }
         exp=e;
         mod=m;
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        long long head,freq,tail;
+        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         mym.initMontgomery(cm,cm,m);
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        double intervel=(tail-head)*1000.0/freq;
+        cout<<"in quickModexp-initmym, time used="<<intervel<<" ms"<<endl;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         cmr=mym.myMontgomeryTo();
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        intervel=(tail-head)*1000.0/freq;
+        cout<<"in quickModexp-initmym, time used="<<intervel<<" ms"<<endl;
+        #endif
     }
     QuickModExp()=default;
     void initQuick(SimpleBigint c,SimpleBigint e,SimpleBigint m){
@@ -31,8 +47,24 @@ public:
         }
         exp=e;
         mod=m;
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        long long head,freq,tail;
+        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         mym.initMontgomery(cm,cm,m);
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        double intervel=(tail-head)*1000.0/freq;
+        cout<<"in quickModexp-initmym, time used="<<intervel<<" ms"<<endl;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         cmr=mym.myMontgomeryTo();
+        #ifdef _TEST_TIME_QUCK_MODEXP
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        intervel=(tail-head)*1000.0/freq;
+        cout<<"in quickModexp-initmym, time used="<<intervel<<" ms"<<endl;
+        #endif
     }
     void quickmodexp();
 };

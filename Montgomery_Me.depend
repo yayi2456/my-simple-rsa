@@ -10,7 +10,7 @@
 	<Windows.h>
 	"layersModexpOpenCL.h"
 
-1592834803 d:\languages\codeblocks\montgomery_me\simplebigint.h
+1593002584 d:\languages\codeblocks\montgomery_me\simplebigint.h
 	<vector>
 	<iostream>
 	<string>
@@ -18,6 +18,7 @@
 	<iomanip>
 	<math.h>
 	<pmmintrin.h>
+	"switches.h"
 
 1592939735 source:d:\languages\codeblocks\montgomery_me\simplemontgomery.cpp
 	"simplemontgomery.h"
@@ -56,7 +57,7 @@
 1587650079 source:d:\languages\codeblocks\montgomery_me\simplemodexp.cpp
 	"simpleModexp.h"
 
-1592845890 source:d:\languages\codeblocks\montgomery_me\simplersa.cpp
+1593001945 source:d:\languages\codeblocks\montgomery_me\simplersa.cpp
 	"simpleRSA.h"
 
 1587537860 d:\languages\codeblocks\montgomery_me\threadmontgomery.h
@@ -139,11 +140,13 @@
 	<algorithm>
 	<vector>
 
-1592993879 d:\languages\codeblocks\montgomery_me\quickmodexp.h
+1593002825 d:\languages\codeblocks\montgomery_me\quickmodexp.h
 	"simpleBigint.h"
 	"simplemontgomery.h"
 	<omp.h>
 
-1592993867 source:d:\languages\codeblocks\montgomery_me\quickmodexp.cpp
+1593002744 source:d:\languages\codeblocks\montgomery_me\quickmodexp.cpp
 	"quickModexp.h"
+
+1593002567 d:\languages\codeblocks\montgomery_me\switches.h
 
