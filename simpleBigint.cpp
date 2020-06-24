@@ -394,20 +394,45 @@ SimpleBigint SimpleBigint::moveby2_divide(int num){
         }
         res.numbers.erase(it);
     }
-    if((*res.numbers.begin())%(int)pow(2,elementsinside)!=0){
+    ///
+/*    if((*res.numbers.begin())%(int)pow(2,elementsinside)!=0){
         cerr<<"error!!!!!!!!!!!!!!!!:"<<elementsinside<<endl;
+    }*/
+    unsigned maskallone=0xFFFFFFFF;
+    unsigned maskres;
+    //cout<<hex<<fixed << setw(8) << setfill('0')<<(maskallone>>32)<<endl;
+ /*   if((res.numbers[0])%((uint32_t)pow(2,elementsinside))!=((res.numbers[0])&(maskallone>>(32-elementsinside)))){
+        //cout<<"pow\n"<<hex<<fixed << setw(8) << setfill('0')<<(res.numbers[0])%((uint32_t)pow(2,elementsinside))<<endl<<((res.numbers[0])&(maskallone>>(32-elementsinside)))<<endl;
+        //cout<<"pow\n"<<hex<<fixed << setw(8) << setfill('0')<<((uint32_t)pow(2,elementsinside))<<endl<<(maskallone>>(32-elementsinside))<<endl<<res.numbers[0]<<endl<<elementsinside<<endl;;
+        cout<<"elemengsize="<<elementsinside<<endl<<"masknuo="<<maskres<<endl<<"mask="<<((res.numbers[0])&(maskallone>>(32-elementsinside)))<<endl;
+        cout<<"xp="<<(32-elementsinside)<<endl;
+    }*/
+    ////=========
+    if(elementsinside==0){
+        maskres=0;
+    }else{
+        maskres=maskallone>>(32-elementsinside);
     }
+    if(((res.numbers[0])&maskres)!=0){
+        cerr<<"error!!!!!!!!!!!!!!!!:>>>"<<elementsinside<<endl;
+    }
+    ///
+
     uint32_t out=0;
+    uint32_t mask=(0xffffffff>>(32-elementsinside));//
     for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
         uint32_t  out2=(*it)%(int)pow(2,elementsinside);//cout<<"out:"<<out<<endl;
+        //uint32_t out2=(*it)&mask;
         (*it)>>=elementsinside;//cout<<"(*it)"<<(*it)<<endl;
+        //(*it)=(*it)|(out<<(32-elementsinside));
         (*it)+=out<<(32-elementsinside);//cout<<"(*it)"<<(*it)<<endl;
         out=out2;
     }
-    for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
+    /*for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
         if((*it)!=0)break;
         res.numbers.erase(it);
-    }
+    }*/
+    res.trimnumber();
     return res;
 }
 void SimpleBigint::trimnumber(){

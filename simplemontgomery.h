@@ -26,8 +26,24 @@ public:
         B=b;
         N=n;
         R.getfromuint32(1,b.numbers.size()-1);
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        long long head,freq,tail;
+        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         R2modN=calR2modN();
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        double intervel=(tail-head)*1000.0/freq;
+        cout<<"in mym-calr2modn, time used="<<intervel<<" ms"<<endl;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         N_1=calN_1();
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        intervel=(tail-head)*1000.0/freq;
+        cout<<"in mym-caln1, time used="<<intervel<<" ms"<<endl;
+        #endif
     }
     //唯一需要除法取模计算的函数，预先计算
     //计算R^2 mod N

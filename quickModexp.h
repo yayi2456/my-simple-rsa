@@ -3,7 +3,6 @@
 #include"simpleBigint.h"
 #include"simplemontgomery.h"
 #include<omp.h>
-//#define _TWO_TASKS_
 
 class QuickModExp{
 public:
@@ -36,7 +35,7 @@ public:
         #ifdef _TEST_TIME_QUCK_MODEXP
         QueryPerformanceCounter((LARGE_INTEGER*)&tail);
         intervel=(tail-head)*1000.0/freq;
-        cout<<"in quickModexp-initmym, time used="<<intervel<<" ms"<<endl;
+        cout<<"in quickModexp-mto, time used="<<intervel<<" ms"<<endl;
         #endif
     }
     QuickModExp()=default;

@@ -46,19 +46,31 @@ SimpleBigint MyMontgomery::calN_1(){
     SimpleBigint rk(1,0);//k=1,N*N'=-1 mod 2,N'=1
     //SimpleBigint fx_1(N);
     uint32_t t=0;
-    SimpleBigint frk(N*rk+SimpleBigint(1,0));
+    SimpleBigint frk(N+SimpleBigint(1,0));
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    long long head,freq,tail;
+    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+    #endif
     for(unsigned k=2;k<=32*(R.numbersLength()-1);++k){
         //f(r)=N*N'+1
         //cout<<"frk="<<frk<<endl;
         SimpleBigint tfr_1;//t mod p = p-tfr_1 mod p
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         tfr_1=frk.moveby2_divide(k-1);
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        summove+=(tail-head)*1000.0/freq;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         //cout<<"k-1=0x"<<k-1<<" frk=0x"<<frk<<" tfr_1=0x"<<tfr_1<<endl;
         //SimpleBigint np(p);//cout<<"can i find"<<endl;
         //t=0/1;t*N=-tfr_1 mod p --> tN=-tfr_1 mod 2;N is a prime,t \in [0,1]
         //if t==0 then tfr_1.getbyindex(0)%2!=1 --> 偶数
         //if t==1 then trf_1.getbyindex(0)%2!=0 --> 奇数
         //这样省去驱魔的过程
-
          if(tfr_1.getbyIndex(0)%2!=0){
             //奇数
             //cout<<"\n\nupdate:"<<tfr_1.getbyIndex(0)<<endl;
@@ -67,17 +79,49 @@ SimpleBigint MyMontgomery::calN_1(){
         else if(tfr_1.getbyIndex(0)%2!=1){
             t=0;
         }
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        sumgetby+=(tail-head)*1000.0/freq;
+        #endif
         //cout<<"tfr_1="<<tfr_1<<endl;
         if(t){
+            #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+            QueryPerformanceCounter((LARGE_INTEGER*)&head);
+            #endif
             rk=(rk+pk);
+            #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+            QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+            sumrk1+=(tail-head)*1000.0/freq;
+            QueryPerformanceCounter((LARGE_INTEGER*)&head);
+            #endif
             frk=N*rk+SimpleBigint(1,0);
+            #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+            QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+            sumrk2+=(tail-head)*1000.0/freq;
+            #endif
         }
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        sumrk+=(tail-head)*1000.0/freq;
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
         //cout<<" pk=0x"<<pk<<" t=0x"<<t<<" rk=0x"<<rk<<endl;
         //else rk=rk;
         pk=pk*p;
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        summul+=(tail-head)*1000.0/freq;
+        #endif
         //cout<<"index="<<k<<",t="<<t<<",pk="<<pk<<",rk="<<rk<<endl;
     }
     //cout<<"N_1="<<rk<<endl;
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    cout<<"in mym-caln1-moveby2, time used="<<summove<<" ms"<<endl;
+    cout<<"in mym-caln1-getbyndex, time used="<<sumgetby<<" ms"<<endl;
+    cout<<"in mym-caln1-rk1, time used="<<sumrk1<<" ms"<<endl;
+    cout<<"in mym-caln1-rk2, time used="<<sumrk2<<" ms"<<endl;
+    cout<<"in mym-caln1-mul, time used="<<summul<<" ms"<<endl;
+    #endif
     return rk;
 }
 SimpleBigint MyMontgomery::myMontgomeryTo(bool isA){
@@ -90,7 +134,6 @@ SimpleBigint MyMontgomery::myMontgomeryTo(bool isA){
     //cout<<"change to M-form: "<<value<<endl;
     result=myMontgomeryReduction(value);
     return result;
-
 }
 
 SimpleBigint MyMontgomery::myMontgomeryMul( SimpleBigint&AR, SimpleBigint&BR){

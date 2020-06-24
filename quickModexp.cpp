@@ -31,20 +31,26 @@ void QuickModExp::quickmodexp(){
     cout<<"in quickModexp-core, time used="<<intervel<<" ms"<<endl;
     #endif
     #else
-    #ifdef _QUICK_MODEXP_DEBUG_
-    cout<<"two-tasks"<<endl;
-    #endif // _QUICK_MODEXP_DEBUG_
+    #ifdef _TEST_TIME_QUCK_MODEXP
+    long long head,freq,tail;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     SimpleBigint tmpr=cmr;
-    SimpleBigint resr=mym.R%mym.N;
+    SimpleBigint resr=mym.myMontgomeryReduction(mym.R2modN);//mym.R%mym.N;
+    #ifdef _TEST_TIME_QUCK_MODEXP
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in quickModexp-twotask-r%n, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     int allones=0,allbits=0;
     bool isone[allbits+1]={0};
     bool isok[allbits+1]={0};
     allbits=exp.numbersLength()*32;
     SimpleBigint precomputed2i[allbits+1];
-    #ifdef _QUICK_MODEXP_DEBUG_
-    cout<<"begin"<<endl;
-    #endif // _QUICK_MODEXP_DEBUG_
-    /*#pragma omp parallel num_threads(2)
+    /*±»·ÏÆúµÄÒ»°æ
+    #pragma omp parallel num_threads(2)
     {
     for(int i=0;i<exp.numbersLength();++i){
         for(uint32_t j=exp.numbers[i],jnum=0;jnum<32;j/=2,++jnum){
@@ -95,9 +101,9 @@ void QuickModExp::quickmodexp(){
                 for(uint32_t j=exp.numbers[i],jnum=0;jnum<32;j/=2,++jnum){
                     if(j%2!=0){
                         while(precomputed2i[place].numbersLength()==0){
-                            cout<<"waiting for isok at place="<<place<<endl;
+                            //cout<<"waiting for isok at place="<<place<<endl;
                             //#pragma omp flush(precomputed2i)
-                            Sleep(0);
+                            //Sleep(0);
                         }
                         resr=mym.simdMontgomeryMul_avx256(resr,precomputed2i[place]);
                         #ifdef _QUICK_TWOTASK_DEBUG_
@@ -109,6 +115,11 @@ void QuickModExp::quickmodexp(){
             }
         }
     }
+    #ifdef _TEST_TIME_QUCK_MODEXP
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000.0/freq;
+    cout<<"in quickModexp-twotask-core, time used="<<intervel<<" ms"<<endl;
+    #endif
     #endif
     #ifdef _QUICK_MODEXP_DEBUG_
     cout<<"modexpR-1 done with tmpr="<<tmpr<<endl;
