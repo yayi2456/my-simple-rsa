@@ -442,3 +442,39 @@ void SimpleBigint::trimnumber(){
         else break;
     }
 }
+#ifndef _OPENMP_MOVE_MUL
+SimpleBigint SimpleBigint::moveby2_mul(){
+    numbers.push_back(0);
+    uint32_t overflow=0;
+    for(int i=0;i<numbers.size();++i){
+        uint32_t mask=0x80000000;
+        uint32_t thisoverflow=((numbers[i]&mask)==0)?0:1;
+        numbers[i]<<=1;
+        numbers[i]+=overflow;
+        overflow=thisoverflow;
+    }
+    trimnumber();
+    return *this;
+}
+#else
+SimpleBigint SimpleBigint::moveby2_mul(){
+    numbers.push_back(0);
+    uint32_t overflow[numbers.size()];
+    uint32_t mask=0x80000000;//num增加，时间增加
+    #pragma omp parallel num_threads(1)
+    {
+    #pragma omp for
+    for(int i=0;i<numbers.size();++i){
+        overflow[i]=((numbers[i]&mask)==0)?0:1;
+        numbers[i]<<=1;
+    }
+    #pragma omp for
+    for(int i=1;i<numbers.size();++i){
+        numbers[i]+=overflow[i-1];
+    }
+    }
+
+    trimnumber();
+    return *this;
+}
+#endif

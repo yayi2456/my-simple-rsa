@@ -9,6 +9,7 @@
 //#define _QUICK_MODEXP_DEBUG_
 //#define _QUICK_TWOTASK_DEBUG_
 #define _TEST_TIME_QUCK_MODEXP
-#define _TWO_TASKS_
-
+//#define _TWO_TASKS_
+///smpleBigint
+//#define _OPENMP_MOVE_MUL//do not open this
 #endif // _SWITCHES_

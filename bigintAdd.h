@@ -1,5 +1,5 @@
-#ifndef _LAYERS_MODEXP_OPENCL_
-#define _LAYERS_MODEXP_OPENCL_
+#ifndef _OPENCL_BIG_ADD
+#define _OPENCL_BIG_ADD
 #include <stdio.h>
 #include <stdlib.h>
 #include <CL/cl.h>

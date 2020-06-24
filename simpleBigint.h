@@ -8,6 +8,7 @@
 #include<math.h>
 #include <pmmintrin.h>
 #include"switches.h"
+#include<omp.h>
 //#define _DEBUG
 
 using namespace std;
@@ -54,6 +55,7 @@ class SimpleBigint{
     SimpleBigint getfirst(int nums);//mod，实际上取得是一个大数的低位
     SimpleBigint getlast(int nums);//divide，实际上取得是一个大数的高位，一共取nums>numbersLength?numbersLength:nums
     SimpleBigint moveby2_divide(int num);//以2进制为单位向右移动
+    SimpleBigint moveby2_mul();
     void trimnumber();
 };
 #endif

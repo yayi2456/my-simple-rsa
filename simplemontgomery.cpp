@@ -47,9 +47,10 @@ SimpleBigint MyMontgomery::calN_1(){
     //SimpleBigint fx_1(N);
     uint32_t t=0;
     SimpleBigint frk(N+SimpleBigint(1,0));
+    SimpleBigint ntmp=N;
     #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
     long long head,freq,tail;
-    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0;
+    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0,sumrkres=0;
     QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
     #endif
     for(unsigned k=2;k<=32*(R.numbersLength()-1);++k){
@@ -83,18 +84,31 @@ SimpleBigint MyMontgomery::calN_1(){
         QueryPerformanceCounter((LARGE_INTEGER*)&tail);
         sumgetby+=(tail-head)*1000.0/freq;
         #endif
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&head);
+        #endif
+        //ntmp=ntmp*2;//
+        ntmp.moveby2_mul();
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+        sumrk1+=(tail-head)*1000.0/freq;
+        #endif
         //cout<<"tfr_1="<<tfr_1<<endl;
         if(t){
             #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
             QueryPerformanceCounter((LARGE_INTEGER*)&head);
             #endif
             rk=(rk+pk);
+            //rk=1+t1*2+t2*2^2+...+tn-1*2^n-1
             #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
             QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-            sumrk1+=(tail-head)*1000.0/freq;
+            sumrkres+=(tail-head)*1000.0/freq;
             QueryPerformanceCounter((LARGE_INTEGER*)&head);
             #endif
-            frk=N*rk+SimpleBigint(1,0);
+            //frk=((N+1+(t1*2))N+1+(t2*2*2))N+1...
+            //frk=N*rk+SimpleBigint(1,0);
+            frk=frk+ntmp;
+            //if(!(frk==debug_frk))cerr<<"\n\n==========\n\n";
             #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
             QueryPerformanceCounter((LARGE_INTEGER*)&tail);
             sumrk2+=(tail-head)*1000.0/freq;
@@ -107,7 +121,9 @@ SimpleBigint MyMontgomery::calN_1(){
         #endif
         //cout<<" pk=0x"<<pk<<" t=0x"<<t<<" rk=0x"<<rk<<endl;
         //else rk=rk;
-        pk=pk*p;
+        //pk=pk*p;
+        pk.moveby2_mul();
+        //cout<<"pk="<<pk<<endl;
         #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
         QueryPerformanceCounter((LARGE_INTEGER*)&tail);
         summul+=(tail-head)*1000.0/freq;
@@ -119,6 +135,7 @@ SimpleBigint MyMontgomery::calN_1(){
     cout<<"in mym-caln1-moveby2, time used="<<summove<<" ms"<<endl;
     cout<<"in mym-caln1-getbyndex, time used="<<sumgetby<<" ms"<<endl;
     cout<<"in mym-caln1-rk1, time used="<<sumrk1<<" ms"<<endl;
+    cout<<"in mym-caln1-rkres, time used="<<sumrkres<<" ms"<<endl;
     cout<<"in mym-caln1-rk2, time used="<<sumrk2<<" ms"<<endl;
     cout<<"in mym-caln1-mul, time used="<<summul<<" ms"<<endl;
     #endif
