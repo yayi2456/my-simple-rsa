@@ -24,7 +24,7 @@
 1593014434 source:d:\languages\codeblocks\montgomery_me\simplemontgomery.cpp
 	"simplemontgomery.h"
 
-1593014507 source:d:\languages\codeblocks\montgomery_me\simplebigint.cpp
+1593014640 source:d:\languages\codeblocks\montgomery_me\simplebigint.cpp
 	"simpleBigint.h"
 
 1593003212 d:\languages\codeblocks\montgomery_me\simplemontgomery.h
@@ -151,8 +151,9 @@
 
 1593014659 d:\languages\codeblocks\montgomery_me\switches.h
 
-1592826346 d:\languages\codeblocks\montgomery_me\bigintadd.h
+1593016338 d:\languages\codeblocks\montgomery_me\bigintadd.h
 	<stdio.h>
 	<stdlib.h>
 	<CL/cl.h>
+	"simpleBigint.h"
 

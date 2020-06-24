@@ -1,19 +1,13 @@
-
-__kernel void hello(__global char* string)
-{
-    string[0] = 'H';
-    string[1] = 'e';
-    string[2] = 'l';
-    string[3] = 'l';
-    string[4] = 'o';
-    string[5] = ',';
-    string[6] = ' ';
-    string[7] = 'W';
-    string[8] = 'o';
-    string[9] = 'r';
-    string[10] = 'l';
-    string[11] = 'd';
-    string[12] = '!';
-    string[13] = '\0';
-
+__kernel void badd(__global uint32_t*add1,__global uint32_t*add2,__global uint32_t*sumres,__global uint32_t*carryres){
+    int myid=get_global_id(0);
+    uint64_t addres;
+    addres=add1[myid]+add2[myid];
+    uint64_t maskme=0xFFFFFFFF;
+    sumres[myid]=addres&maskme;
+    carryres[myid]=addres>>32;
+    while(myid!=0 && carryres[myid-1]!=0){
+        addres=addres+carryres[myid-1];
+        sumres[myid]=addres&maskme;
+        carryres[myid]=addres>>32;
+    }
 }
