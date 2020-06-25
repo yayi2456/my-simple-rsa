@@ -33,7 +33,6 @@ SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2)
 	ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
 	//发现并初始化设备
 	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
-
 	//创建上下文环境
 	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
 
@@ -54,19 +53,38 @@ SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2)
 	cl_mem a2memobj=clCreateBuffer(context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,maxlength*sizeof(uint32_t),a2mem,&ret);
 	cl_mem sumresobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(uint32_t),nullptr,&ret);
 	cl_mem carryobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(uint32_t),nullptr,&ret);
+
 	//创建kernel程序
 	program = clCreateProgramWithSource(context, 1, (const char **)&source_str,(const size_t *)&source_size, &ret);
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 	kernel = clCreateKernel(program, "badd", &ret);
+	if(ret!=0){
+        cout<<"clBuildProgram ret="<<ret<<endl;
+        size_t len;
+        char buffer[8 * 1024];
+        printf("Error: Failed to build program executable!\n");
+        clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+        printf("%s\n", buffer);
+    }
 
 	//设置kernel参数
 	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a1memobj);
-	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a2memobj);
-	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&sumresobj);
-	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&carryobj);
+	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&a2memobj);
+	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&sumresobj);
+	ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&carryobj);
+	if(ret!=0){
+        cout<<"clBuildProgram ret="<<ret<<endl;
+        printf("Error: Failed to set kernel Arg!\n");
+    }
 
 	//执行kernel
 	//ret = clEnqueueTask(command_queue, kernel, 0, NULL,NULL);
+	#ifdef _TEST_TIME_KERNEL_
+	long long head,freq,tail;
+    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0,sumrkres=0;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	#endif // _TEST_TIME_KERNEL_
 	size_t global_work_size[1] = {maxlength};
     cl_event enentPoint;
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, global_work_size, NULL, 0, NULL, &enentPoint);
@@ -85,6 +103,11 @@ SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2)
     memcpy(sumres,&maxlength,sizeof(uint32_t));
     SimpleBigint finaladdres=SimpleBigint(sumres);
     finaladdres.trimnumber();
+    #ifdef _TEST_TIME_KERNEL_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in bigintAdd-, time used="<<intervel<<" ms"<<endl;
+    #endif // _TEST_TIME_KERNEL_
     //puts(string);
 
 	/* Finalization */

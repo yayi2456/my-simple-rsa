@@ -6,6 +6,7 @@
 #include <immintrin.h>
 #include<cstring>
 #include<windows.h>
+#include"bigintAdd.h"
 //R=(2^32)^M，M=B.size()-1，（如果要分解B的话，我们就分解B）
 //其中
 class MyMontgomery{

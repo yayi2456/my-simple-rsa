@@ -12,4 +12,6 @@
 //#define _TWO_TASKS_
 ///smpleBigint
 //#define _OPENMP_MOVE_MUL//do not open this
+///bigintAdd
+#define _TEST_TIME_KERNEL_
 #endif // _SWITCHES_

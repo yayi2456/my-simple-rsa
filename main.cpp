@@ -6,7 +6,7 @@
 #include"severalMsgRSA.h"
 #include<time.h>
 #include<Windows.h>
-#include"bigintAdd.h"
+#include"tmp.h"
 using namespace std;
 //#define _MAIN_DEBUG_
 
@@ -262,6 +262,26 @@ void testCrtQuickRSA(unsigned length){
     cout<<"COMPARE:"<<endl;
     cout<<msg<<endl<<demsg<<endl;
 }
+void testaddOpencl(unsigned length){
+    SimpleBigint msg=generateMsg(length);
+    SimpleBigint msg2=generateMsg(length);
+    cout<<"msg="<<msg<<endl<<"msg2="<<msg2<<endl;
+    #ifdef _TEST_TIME_KERNEL_
+	long long head,freq,tail;
+    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0,sumrkres=0;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+	#endif // _TEST_TIME_KERNEL_
+	SimpleBigint res1=msg+msg2;
+    #ifdef _TEST_TIME_KERNEL_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in bigintAdd-, time used="<<intervel<<" ms"<<endl;
+    #endif // _TEST_TIME_KERNEL_
+    cout<<"res1="<<res1<<endl;
+    SimpleBigint res2=bigintAdd(msg,msg2);
+    cout<<"res2="<<res2<<endl;
+}
 int main(int argc,char*argv[]){
     unsigned length=512;
     int threads=16,layers=5;
@@ -269,7 +289,8 @@ int main(int argc,char*argv[]){
     //testSimpleLayersMultiRSA(length,threads,layers);
     //testCrtQuickRSA(length);
     //cout<<"----------------------------"<<endl;
-    testSimpleQuickRSA(length);
-    //testME();
+    //testSimpleQuickRSA(length);
+    testaddOpencl(length);
+    //testMe();
     return 0;
 }

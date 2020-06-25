@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <CL/cl.h>
 #include"simpleBigint.h"
-
+#include<windows.h>
+using namespace std;
 SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2);
 #define MEM_SIZE (128)
 #define MAX_SOURCE_SIZE (0x100000)
