@@ -294,46 +294,24 @@ void testaddOpencl(unsigned length){
     #endif // _TEST_TIME_KERNEL_
     cout<<"res2="<<res2<<endl;
 }
-//testMultimesCrtQuick 测试多次解密平均值
-void testMultimesCrtQuick(unsigned length,unsigned times=100){
-    SimpleBigint enmsg;
-    long long head,freq,tail;
-    double sum=0;
-    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
-    for(int i=0;i<times;++i){
-        enmsg=generateMsg(length);
-        #ifdef _MAIN_DEBUG_
-        cout<<"MSG:"<<enmsg<<endl;
-        #endif
-        CrtRSA rsame;
-        if(!rsame.generateKey(length)){
-            cout<<"quiting..."<<endl;
-            return;
-        }
-        QueryPerformanceCounter((LARGE_INTEGER*)&head);
-        SimpleBigint demsg=rsame.decryptme_quick(enmsg);
-        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-        sum+=(tail-head)*1000.0/freq;
-    }
-    sum/=times;
-    cout<<"in testMultimesCrtQuick-decrypt, average time used="<<sum<<" ms, in  "<<times<<" times "<<endl;
-}
 int main(int argc,char*argv[]){
-    #ifdef _AVX2_ENABLED_
-    cout<<endl<<"bigint-mul->AVX enabled"<<endl;
-    #endif // _AVX2_ENABLED_
-    #ifdef _TWO_TASKS_
-    cout<<endl<<"RL parallel->TT enabled"<<endl;
-    #endif // _TWO_TASKS_
-    #ifdef _OPEN_OPENMP_
-    cout<<endl<<"crt parallel->OMP enabled"<<endl;
-    #endif // _OPEN_OPENMP_
     unsigned length=2048;
     //int threads=16,layers=5;
     if(argc>1)length=strtol(argv[1],nullptr,10);
-    //testMultimesCrtQuick(length,100);
+    #ifdef _TEST_CRT_MAIN
     testCrtQuickRSA(length);
-    //testSimpleQuickRSA(length);
+    #else
+    testSimpleQuickRSA(length);
+    #endif
+    #ifdef _AVX2_ENABLED_
+    cout<<endl<<"bigint-mul enabled"<<endl;
+    #endif // _AVX2_ENABLED_
+    #ifdef _TWO_TASKS_
+    cout<<endl<<"RL parallel enabled"<<endl;
+    #endif // _TWO_TASKS_
+    #ifdef _OPEN_OPENMP_
+    cout<<endl<<"crt parallel enabled"<<endl;
+    #endif // _OPEN_OPENMP_
     //testSimpleLayersMultiRSA(length,threads,layers);
     //testaddOpencl(length);
     //testMe();

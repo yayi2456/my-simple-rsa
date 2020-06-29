@@ -36,23 +36,23 @@ SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2)
 	//创建上下文环境
 	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
 
-	//创建命令队列
-	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+	//创建命令队列，enable性能测试
+	command_queue = clCreateCommandQueue(context, device_id, CL_QUEUE_PROFILING_ENABLE, &ret);
 
 	//创建设备缓冲区
 	//memobj = clCreateBuffer(context, CL_MEM_READ_WRITE,MEM_SIZE * sizeof(char), NULL, &ret);
 	//处理a1、a2
 	int maxlength=a1.numbersLength()>a2.numbersLength()?a1.numbersLength():a2.numbersLength();
-	void*a1mem=malloc(maxlength*sizeof(uint32_t));
-	void*a2mem=malloc(maxlength*sizeof(uint32_t));
-	memset(a1mem,0,maxlength*sizeof(uint32_t));
-	memset(a2mem,0,maxlength*sizeof(uint32_t));
-	memcpy(a1mem,&(a1.numbers[0]),sizeof(uint32_t)*a1.numbersLength());
-	memcpy(a2mem,&(a2.numbers[0]),sizeof(uint32_t)*a2.numbersLength());
-	cl_mem a1memobj=clCreateBuffer(context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,maxlength*sizeof(uint32_t),a1mem,&ret);
-	cl_mem a2memobj=clCreateBuffer(context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,maxlength*sizeof(uint32_t),a2mem,&ret);
-	cl_mem sumresobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(uint32_t),nullptr,&ret);
-	cl_mem carryobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(uint32_t),nullptr,&ret);
+	void*a1mem=malloc(maxlength*sizeof(cl_uint));
+	void*a2mem=malloc(maxlength*sizeof(cl_uint));
+	memset(a1mem,0,maxlength*sizeof(cl_uint));
+	memset(a2mem,0,maxlength*sizeof(cl_uint));
+	memcpy(a1mem,&(a1.numbers[0]),sizeof(cl_uint)*a1.numbersLength());
+	memcpy(a2mem,&(a2.numbers[0]),sizeof(cl_uint)*a2.numbersLength());
+	cl_mem a1memobj=clCreateBuffer(context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,maxlength*sizeof(cl_uint),a1mem,&ret);
+	cl_mem a2memobj=clCreateBuffer(context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,maxlength*sizeof(cl_uint),a2mem,&ret);
+	cl_mem sumresobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(cl_uint),nullptr,&ret);
+	cl_mem carryobj=clCreateBuffer(context,CL_MEM_READ_WRITE,maxlength*sizeof(cl_uint),nullptr,&ret);
 
 	//创建kernel程序
 	program = clCreateProgramWithSource(context, 1, (const char **)&source_str,(const size_t *)&source_size, &ret);
@@ -79,35 +79,33 @@ SimpleBigint bigintAdd(SimpleBigint a1,SimpleBigint a2)
 
 	//执行kernel
 	//ret = clEnqueueTask(command_queue, kernel, 0, NULL,NULL);
-	#ifdef _TEST_TIME_KERNEL_
-	long long head,freq,tail;
-    double summove=0,sumgetby=0,summul=0,sumrk=0,sumrk1=0,sumrk2=0,sumrkres=0;
-    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
-	#endif // _TEST_TIME_KERNEL_
+
 	size_t global_work_size[1] = {maxlength};
     cl_event enentPoint;
     ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, global_work_size, NULL, 0, NULL, &enentPoint);
     clWaitForEvents(1,&enentPoint); //wait
     clReleaseEvent(enentPoint);
-
+    //获取性能数据
+    #ifdef _TEST_TIME_KERNEL_
+    cl_ulong time_start, time_end;
+    double total_time;
+    clGetEventProfilingInfo(enentPoint, CL_PROFILING_COMMAND_START, sizeof(time_start), &time_start, NULL);
+    clGetEventProfilingInfo(enentPoint, CL_PROFILING_COMMAND_END, sizeof(time_end), &time_end, NULL);
+    double kernel_interv=(time_end-time_start)/1000000.0;
+    cout<<"Execution time in milliseconds of kernel ="<<kernel_interv<<" ms"<<endl;
+    #endif
 	//从membuffer获取执行结果
-	void*sumres=malloc(sizeof(uint32_t)*(maxlength+2));
-	void*carryres=malloc(sizeof(uint32_t)*(maxlength));
+	void*sumres=malloc(sizeof(cl_uint)*(maxlength+2));
+	void*carryres=malloc(sizeof(cl_uint)*(maxlength));
 
 	ret = clEnqueueReadBuffer(command_queue, sumresobj, CL_TRUE, 0,
-		maxlength * sizeof(uint32_t),sumres+sizeof(uint32_t), 0, NULL, NULL);
+		maxlength * sizeof(cl_uint),sumres+sizeof(cl_uint), 0, NULL, NULL);
     ret = clEnqueueReadBuffer(command_queue, carryobj, CL_TRUE, 0,
-		maxlength * sizeof(uint32_t),carryres, 0, NULL, NULL);
-    memcpy(sumres+sizeof(uint32_t)*(maxlength+1),carryres+sizeof(uint32_t)*(maxlength-1),sizeof(uint32_t));
-    memcpy(sumres,&maxlength,sizeof(uint32_t));
+		maxlength * sizeof(cl_uint),carryres, 0, NULL, NULL);
+    memcpy(sumres+sizeof(cl_uint)*(maxlength+1),carryres+sizeof(cl_uint)*(maxlength-1),sizeof(cl_uint));
+    memcpy(sumres,&maxlength,sizeof(cl_uint));
     SimpleBigint finaladdres=SimpleBigint(sumres);
     finaladdres.trimnumber();
-    #ifdef _TEST_TIME_KERNEL_
-    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-    double intervel=(tail-head)*1000.0/freq;
-    cout<<"in bigintAdd-, time used="<<intervel<<" ms"<<endl;
-    #endif // _TEST_TIME_KERNEL_
     //puts(string);
 
 	/* Finalization */

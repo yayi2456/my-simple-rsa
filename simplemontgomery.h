@@ -23,13 +23,16 @@ public:
         {R2modN=calR2modN();N_1=calN_1();}
     MyMontgomery()=default;
     void initMontgomery(SimpleBigint a,SimpleBigint b,SimpleBigint n){
+        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+        long long head,freq,tail,headb,tailb;
+        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+        QueryPerformanceCounter((LARGE_INTEGER*)&headb);
+        #endif
         A=a;
         B=b;
         N=n;
         R.getfromuint32(1,b.numbers.size()-1);
         #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
-        long long head,freq,tail;
-        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
         QueryPerformanceCounter((LARGE_INTEGER*)&head);
         #endif
         R2modN=calR2modN();
@@ -44,6 +47,9 @@ public:
         QueryPerformanceCounter((LARGE_INTEGER*)&tail);
         intervel=(tail-head)*1000.0/freq;
         cout<<"in mym-caln1, time used="<<intervel<<" ms"<<endl;
+        QueryPerformanceCounter((LARGE_INTEGER*)&tailb);
+        intervel=(tailb-headb)*1000.0/freq;
+        cout<<"in mym-mym-all, time used="<<intervel<<" ms"<<endl;
         #endif
     }
     //唯一需要除法取模计算的函数，预先计算

@@ -30,10 +30,32 @@ uint32_t extendEuclideanx0_1_32(uint32_t x0){
 }
 
 SimpleBigint MyMontgomery::calR2modN(){
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    long long head,freq,tail;
+    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     SimpleBigint t=R%N;
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    double intervel=(tail-head)*1000.0/freq;
+    cout<<"in calR2modN-R%N, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     //cout<<"R%N="<<t<<endl;
     t*=t;
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000.0/freq;
+    cout<<"in calR2modN-t*t, time used="<<intervel<<" ms"<<endl;
+    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #endif
     t%=N;
+    #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
+    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
+    intervel=(tail-head)*1000.0/freq;
+    cout<<"in calR2modN-t%N, time used="<<intervel<<" ms"<<endl;
+    #endif
     //cout<<"R2modN_S="<<t<<endl;
     return t;
 }

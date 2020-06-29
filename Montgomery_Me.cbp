@@ -13,9 +13,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-march=core-avx2" />
+					<Add option="-fopenmp" />
 					<Add directory="D:/Library_Cpp/opencl_intel_sdk/system_studio_2020/OpenCL/sdk/include" />
 				</Compiler>
 				<Linker>
+					<Add option="-lgomp -lpthread" />
 					<Add library="D:/Library_Cpp/opencl_intel_sdk/system_studio_2020/OpenCL/sdk/lib/x86/OpenCL.lib" />
 					<Add library="D:/Library_Cpp/opencl_intel_sdk/system_studio_2020/OpenCL/sdk/lib/x64/OpenCL.lib" />
 				</Linker>
@@ -46,11 +49,16 @@
 			<Add library="D:/Library_Cpp/opencl_intel_sdk/system_studio_2020/OpenCL/sdk/lib/x86/OpenCL.lib" />
 			<Add library="D:/Library_Cpp/opencl_intel_sdk/system_studio_2020/OpenCL/sdk/lib/x64/OpenCL.lib" />
 		</Linker>
+		<Unit filename="bigintAdd.cl" />
+		<Unit filename="bigintAdd.cpp" />
+		<Unit filename="bigintAdd.h" />
 		<Unit filename="crtRSA.cpp" />
 		<Unit filename="crtRSA.h" />
 		<Unit filename="layersModexp.cpp" />
 		<Unit filename="layersModexp.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="quickModexp.cpp" />
+		<Unit filename="quickModexp.h" />
 		<Unit filename="severalMsgRSA.cpp" />
 		<Unit filename="severalMsgRSA.h" />
 		<Unit filename="simpleBigint.cpp" />
@@ -61,8 +69,12 @@
 		<Unit filename="simpleRSA.h" />
 		<Unit filename="simplemontgomery.cpp" />
 		<Unit filename="simplemontgomery.h" />
+		<Unit filename="switches.h" />
 		<Unit filename="threadLayerModexp.cpp" />
 		<Unit filename="threadLayerModexp.h" />
+		<Unit filename="tmp.cl" />
+		<Unit filename="tmp.cpp" />
+		<Unit filename="tmp.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

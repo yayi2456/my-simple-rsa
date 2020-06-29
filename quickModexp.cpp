@@ -15,20 +15,47 @@ void QuickModExp::quickmodexp(){
     double intervel=(tail-head)*1000.0/freq;
     cout<<"in quickModexp-r%n, time used="<<intervel<<" ms"<<endl;
     QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    long long head2,tail2,headres,tailres;
+    double sum2=0,sumres=0;
     #endif
     for(int i=0;i<exp.numbersLength();++i){
         for(uint32_t j=exp.numbers[i],jnum=0;jnum<32;j/=2,++jnum){
             if(j%2!=0){
-                resr=mym.simdMontgomeryMul_avx256(resr,tmpr);//_avx256
+                #ifdef _TEST_TIME_QUCK_MODEXP
+                QueryPerformanceCounter((LARGE_INTEGER*)&headres);
+                #endif
+                #ifndef _AVX2_ENABLED_
+                resr=mym.myMontgomeryMul(resr,tmpr);//simdMontgomeryMul_avx256
+                #else
+                resr=mym.simdMontgomeryMul_avx256(resr,tmpr);
+                #endif
+                #ifdef _TEST_TIME_QUCK_MODEXP
+                QueryPerformanceCounter((LARGE_INTEGER*)&tailres);
+                sumres+=((tailres-headres)*1000.0/freq);
+                #endif
                 //myMontgomeryMul(resr,tmpr);
             }
+            #ifdef _TEST_TIME_QUCK_MODEXP
+            QueryPerformanceCounter((LARGE_INTEGER*)&head2);
+            #endif
+            #ifndef _AVX2_ENABLED_
+            tmpr=mym.myMontgomeryMul(tmpr,tmpr);//simdMontgomeryMul_avx256
+            #else
             tmpr=mym.simdMontgomeryMul_avx256(tmpr,tmpr);//simdMontgomeryMul_avx256
+            #endif
+            #ifdef _TEST_TIME_QUCK_MODEXP
+            QueryPerformanceCounter((LARGE_INTEGER*)&tail2);
+            sum2+=((tail2-head2)*1000.0/freq);
+            #endif
         }
     }
     #ifdef _TEST_TIME_QUCK_MODEXP
     QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-     intervel=(tail-head)*1000.0/freq;
+    intervel=(tail-head)*1000.0/freq;
     cout<<"in quickModexp-core, time used="<<intervel<<" ms"<<endl;
+    cout<<"in quickModexp-2^i, time used="<<sum2<<" ms"<<endl;
+    cout<<"in quickModexp-res*m, time used="<<sumres<<" ms"<<endl;
+    cout<<"in quickModexp-one-m, time used="<<(sum2/(32*exp.numbersLength()))<<" ms"<<endl;
     #endif
     #else
     #ifdef _TEST_TIME_QUCK_MODEXP
@@ -76,7 +103,8 @@ void QuickModExp::quickmodexp(){
         }
     }
 */
-
+    long long headone,tailone;
+    double sumone=0;
     #pragma omp parallel for
     for(int my_id=0;my_id<2;++my_id){
         if(my_id==0){
@@ -89,7 +117,19 @@ void QuickModExp::quickmodexp(){
                         #pragma omp flush(precomputed2i)
                     }
                     ++place;
+                    #ifdef _TEST_TIME_QUCK_MODEXP
+                    QueryPerformanceCounter((LARGE_INTEGER*)&headone);
+                    #endif
+                    #ifndef _AVX2_ENABLED_
+                    tmpr=mym.myMontgomeryMul(tmpr,tmpr);//simdMontgomeryMul_avx256
+                    #else
                     tmpr=mym.simdMontgomeryMul_avx256(tmpr,tmpr);//simdMontgomeryMul_avx256
+                    #endif
+                    #ifdef _TEST_TIME_QUCK_MODEXP
+                    QueryPerformanceCounter((LARGE_INTEGER*)&tailone);
+                    sumone+=((tailone-headone)*1000.0/freq);
+                    #endif
+                    //tmpr=mym.simdMontgomeryMul_avx256(tmpr,tmpr);//simdMontgomeryMul_avx256
                     precomputed2i[place]=tmpr;
                     //[place])
                     //[place])
@@ -103,9 +143,14 @@ void QuickModExp::quickmodexp(){
                         while(precomputed2i[place].numbersLength()==0){
                             //cout<<"waiting for isok at place="<<place<<endl;
                             //#pragma omp flush(precomputed2i)
-                            //Sleep(0);
+                            Sleep(0);
                         }
+                        #ifndef _AVX2_ENABLED_
+                        resr=mym.myMontgomeryMul(resr,precomputed2i[place]);//simdMontgomeryMul_avx256
+                        #else
                         resr=mym.simdMontgomeryMul_avx256(resr,precomputed2i[place]);
+                        #endif
+                        //resr=mym.simdMontgomeryMul_avx256(resr,precomputed2i[place]);
                         #ifdef _QUICK_TWOTASK_DEBUG_
                         cout<<"mul done,place="<<place<<endl;
                         #endif
@@ -118,7 +163,8 @@ void QuickModExp::quickmodexp(){
     #ifdef _TEST_TIME_QUCK_MODEXP
     QueryPerformanceCounter((LARGE_INTEGER*)&tail);
     intervel=(tail-head)*1000.0/freq;
-    cout<<"in quickModexp-twotask-core, time used="<<intervel<<" ms"<<endl;
+    cout<<"in quickModexp-twotask, time used="<<intervel<<" ms"<<endl;
+    cout<<"in quickModexp-one-m, time used="<<(sumone/(32*exp.numbersLength()))<<" ms"<<endl;
     #endif
     #endif
     #ifdef _QUICK_MODEXP_DEBUG_
