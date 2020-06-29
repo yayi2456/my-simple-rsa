@@ -1,14 +1,12 @@
 #ifndef _SIMPLE_BIGINT_
 #define _SIMPLE_BIGINT_
+
 #include<vector>
 #include<iostream>
 #include<string>
 #include<stdlib.h>
 #include<iomanip>
 #include<math.h>
-#include <pmmintrin.h>
-#include"switches.h"
-#include<omp.h>
 //#define _DEBUG
 
 using namespace std;
@@ -22,9 +20,9 @@ class SimpleBigint{
     SimpleBigint()=default;
     SimpleBigint(string num);
     SimpleBigint(const SimpleBigint&bigint);
+    //å¾—åˆ°num*2^32^mulsize
     SimpleBigint(const uint64_t num,unsigned mulsize);
     SimpleBigint(uint32_t*num,unsigned from,unsigned to):numbers(num+from,num+to){}
-    SimpleBigint(void*);
     void getfromString(string num);
     void getfromuint32(const uint32_t num,unsigned mulsize);
     SimpleBigint& operator=(const SimpleBigint& bigint);
@@ -41,21 +39,20 @@ class SimpleBigint{
     bool operator==(const SimpleBigint&bigint2)const;
     SimpleBigint operator/(const SimpleBigint&bigint2)const;
     SimpleBigint&operator/=(const SimpleBigint&bigint2);
-    //Ö»Ìá¹©¼òµ¥µÄÈ¡Ä£ÔËËã
+    //åªæä¾›ç®€å•çš„å–æ¨¡è¿ç®—
     SimpleBigint operator%(const SimpleBigint&bigint2)const;
     SimpleBigint&operator%=(const SimpleBigint&bigint2);
-    //ÎªR^2mod N×¼±¸µÄÈ¡Ä£ÔËËã,Ê¹ÓÃNµ÷ÓÃ
+    //ä¸ºR^2mod Nå‡†å¤‡çš„å–æ¨¡è¿ç®—,ä½¿ç”¨Nè°ƒç”¨
     //SimpleBigint R2modN();
     //friend first1inR2(const SimpleBigint&R2);
-    friend istream&operator>>(istream&, SimpleBigint&);//ÒÔÊ®Áù½øÖÆÊä³ö
-    friend ostream&operator<<(ostream&,const SimpleBigint&);//Ê®Áù½øÖÆÊäÈë
+    friend istream&operator>>(istream&, SimpleBigint&);//ä»¥åå…­è¿›åˆ¶è¾“å‡º
+    friend ostream&operator<<(ostream&,const SimpleBigint&);//åå…­è¿›åˆ¶è¾“å…¥
     int numbersLength()const;
     uint32_t getbyIndex(unsigned index)const;
-    SimpleBigint shiftDivide32();//µ÷ÓÃ¶ÔÏó·¢Éú±ä»¯
-    SimpleBigint getfirst(int nums);//mod£¬Êµ¼ÊÉÏÈ¡µÃÊÇÒ»¸ö´óÊıµÄµÍÎ»
-    SimpleBigint getlast(int nums);//divide£¬Êµ¼ÊÉÏÈ¡µÃÊÇÒ»¸ö´óÊıµÄ¸ßÎ»£¬Ò»¹²È¡nums>numbersLength?numbersLength:nums
-    SimpleBigint moveby2_divide(int num);//ÒÔ2½øÖÆÎªµ¥Î»ÏòÓÒÒÆ¶¯
-    SimpleBigint moveby2_mul();
+    SimpleBigint shiftDivide32();//è°ƒç”¨å¯¹è±¡å‘ç”Ÿå˜åŒ–ï¼Œå°†æœ«å°¾çš„0ç§»é™¤ã€‚
+    SimpleBigint getfirst(int nums);//modï¼Œå®é™…ä¸Šå–å¾—æ˜¯ä¸€ä¸ªå¤§æ•°çš„ä½ä½ï¼Œä¸€å…±å–numsä½
+    SimpleBigint getlast(int nums);//divideï¼Œå®é™…ä¸Šå–å¾—æ˜¯ä¸€ä¸ªå¤§æ•°çš„é«˜ä½ï¼Œä¸€å…±å–nums>numbersLength?numbersLength:nums
+    SimpleBigint moveby2_divide(int num);//ä»¥2è¿›åˆ¶ä¸ºå•ä½å‘å³ç§»åŠ¨
     void trimnumber();
 };
 #endif

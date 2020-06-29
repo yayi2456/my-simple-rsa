@@ -5,25 +5,25 @@
 #include<stdlib.h>
 #include<algorithm>
 #include<vector>
-
-//LayersModexp Àà£¬
-//Íê³É·Ö²ãµÄÄ£Ãİ¼ÆËã
+ 
+//LayersModexp ç±»ï¼Œ
+//å®Œæˆåˆ†å±‚çš„æ¨¡å¹‚è®¡ç®—
 class LayersModexp{
 public:
-    SimpleBigint cm;//µ×Êı
-    SimpleBigint exp;//Ö¸Êı
-    SimpleBigint mod;//Ä£Êı
-    SimpleBigint cmexp;//Ä£Ãİ
-    MyMontgomery mym;//ÃÉ¸çÂíÀûÔËËãÆ÷
-    SimpleBigint cmr;//cmµÄÃÉ¸çÂíÀûĞÎÊ½
-    unsigned threads=4;//Ä¬ÈÏÃ¿´Î»®·Ö1/4
-    unsigned layer=1;//»®·Ö´ÎÊı=layer-1£¬Èç¹û²»»®·Ö£¬k=exp
-    //krsnum Ã¿Ò»´Î»®·ÖÖĞÊ£ÓàÄÇ²¿·ÖµÄÖµ
-    vector<SimpleBigint>krsnum;//³¤¶ÈÓ¦¸ÃÊÇlayer//Ë³ĞòÊÇr_1,r_2...r_{layer-1},k
-    //krsvalue Ã¿Ò»²ã¼ÆËã³öÀ´Ö®ºóµÄÖµ
+    SimpleBigint cm;//åº•æ•°
+    SimpleBigint exp;//æŒ‡æ•°
+    SimpleBigint mod;//æ¨¡æ•°
+    SimpleBigint cmexp;//æ¨¡å¹‚
+    MyMontgomery mym;//è’™å“¥é©¬åˆ©è¿ç®—å™¨
+    SimpleBigint cmr;//cmçš„è’™å“¥é©¬åˆ©å½¢å¼
+    unsigned threads=4;//é»˜è®¤æ¯æ¬¡åˆ’åˆ†1/4
+    unsigned layer=1;//åˆ’åˆ†æ¬¡æ•°=layer-1ï¼Œå¦‚æœä¸åˆ’åˆ†ï¼Œk=exp
+    //krsnum æ¯ä¸€æ¬¡åˆ’åˆ†ä¸­å‰©ä½™é‚£éƒ¨åˆ†çš„å€¼
+    vector<SimpleBigint>krsnum;//é•¿åº¦åº”è¯¥æ˜¯layer//é¡ºåºæ˜¯r_1,r_2...r_{layer-1},k
+    //krsvalue æ¯ä¸€å±‚è®¡ç®—å‡ºæ¥ä¹‹åçš„å€¼
     vector<SimpleBigint>krsvalue;
-    //¹¹Ôìº¯Êı£¬Íê³É¹¦ÄÜÓëinitÒ»Ñù
-    SimpleBigint noreduce;//ÓÃÓÚ½âÃÜÖĞ£¬ÊÇcmexpÎ´¾­¹ı×îºóÒ»²½reduceµÄÖµ£¬ÊÇcmeexp*r mod n
+    //æ„é€ å‡½æ•°ï¼Œå®ŒæˆåŠŸèƒ½ä¸initä¸€æ ·
+    SimpleBigint noreduce;//ç”¨äºè§£å¯†ä¸­ï¼Œæ˜¯cmexpæœªç»è¿‡æœ€åä¸€æ­¥reduceçš„å€¼ï¼Œæ˜¯cmeexp*r mod n
     LayersModexp(SimpleBigint c,SimpleBigint e,SimpleBigint m){
         cm=c+m;
         while(cm.numbersLength()<=m.numbersLength()){
@@ -41,10 +41,10 @@ public:
     //     {cmr=mym.myMontgomeryTo();
     //     cmexp=cmr;}
     LayersModexp()=default;
-    //huafenKrsnum º¯Êı½øĞĞ²ã¼¶»®·Ö£¬¼ÇÂ¼Ã¿Ò»²ã¶àÓàµÄÖµ£¬×îºóÒ»¸ö¼ÇÂ¼×îÖÕµÄÖ¸Êı´óĞ¡
-    void huafenKrsnum_min();//Ö¸Êı½ÏĞ¡µÄÊ±ºò£¬Í¨³£ÊÇ32bitsÒÔÄÚ
-    void huafenKrsnum_max(unsigned mul=0);//Ö¸Êı½Ï´óµÄÊ±ºò£¬mulÊÇ×óÒÆµÄÎ»Êı£¬Õâ¸öÊ±ºòºöÂÔthread£¬Ëû¾ÍÊÇ1£¬layers¾ÍÊÇexp.numberLength
-    //initLayersModexp º¯Êı½øĞĞ³õÊ¼»¯
+    //huafenKrsnum å‡½æ•°è¿›è¡Œå±‚çº§åˆ’åˆ†ï¼Œè®°å½•æ¯ä¸€å±‚å¤šä½™çš„å€¼ï¼Œæœ€åä¸€ä¸ªè®°å½•æœ€ç»ˆçš„æŒ‡æ•°å¤§å°
+    void huafenKrsnum_min();//æŒ‡æ•°è¾ƒå°çš„æ—¶å€™ï¼Œé€šå¸¸æ˜¯32bitsä»¥å†…
+    void huafenKrsnum_max(unsigned mul=0);//æŒ‡æ•°è¾ƒå¤§çš„æ—¶å€™ï¼Œmulæ˜¯å·¦ç§»çš„ä½æ•°ï¼Œè¿™ä¸ªæ—¶å€™å¿½ç•¥threadï¼Œä»–å°±æ˜¯1ï¼Œlayerså°±æ˜¯exp.numberLength
+    //initLayersModexp å‡½æ•°è¿›è¡Œåˆå§‹åŒ–
     void initLayersModexp(SimpleBigint c,SimpleBigint e,SimpleBigint m){
         cm=c+m;
         while(cm.numbersLength()<=m.numbersLength()){
@@ -57,20 +57,20 @@ public:
         cmexp=cmr;
         noreduce=cmr;
     }
-    //Ö¸¶¨²ãÊıÓëÃ¿²ã»®·ÖÊı£¨ÕâÀï¾Í½ĞthreadÊı£©
+    //æŒ‡å®šå±‚æ•°ä¸æ¯å±‚åˆ’åˆ†æ•°ï¼ˆè¿™é‡Œå°±å«threadæ•°ï¼‰
     void setThreadandLayer(unsigned t,unsigned l){threads=t;layer=l;}
-    //ÇåÀíÉÏ´Î¼ÆËãµÄ½á¹û
+    //æ¸…ç†ä¸Šæ¬¡è®¡ç®—çš„ç»“æœ
     void clearRes(){cmexp=cmr;}
-    //¼ÆËãÄ£ÃİÖµcmexp
-    void layersmodexp_min();//32bitsÒÔÄÚµÄ¼ÆËã
-    void layersmodexp_max(unsigned mul=0);//¶ÔÓ¦ÓÚhuafen£¬Èç¹ûmul=0£¬Ôò²»»áÊ¹ÓÃlayersModexp½øĞĞ¼ÆËã
+    //è®¡ç®—æ¨¡å¹‚å€¼cmexp
+    void layersmodexp_min();//32bitsä»¥å†…çš„è®¡ç®—
+    void layersmodexp_max(unsigned mul=0);//å¯¹åº”äºhuafenï¼Œå¦‚æœmul=0ï¼Œåˆ™ä¸ä¼šä½¿ç”¨layersModexpè¿›è¡Œè®¡ç®—
 
 };
-//Ê¹ÓÃË³Ğò£º
-//1. ¹¹Ôìº¯Êı»òinit
+//ä½¿ç”¨é¡ºåºï¼š
+//1. æ„é€ å‡½æ•°æˆ–init
 //2. setThreadandLayer
 //3. huafenKrsnum
 //4. layersmodexp
-//5. ´ÓcmexpÖĞÄÃµ½½á¹û
+//5. ä»cmexpä¸­æ‹¿åˆ°ç»“æœ
 #endif // _LAYERS_MOD_EXP_
 

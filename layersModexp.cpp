@@ -15,8 +15,8 @@ void LayersModexp::huafenKrsnum_min(){
         krsnum.push_back(shengyu);
         krsvalue.push_back(SimpleBigint(0,0));
         tmp=tmps;
-        //·ÀÖ¹threads^layer¹ı´ó£¬µ¼ÖÂ×îÖÕµÄÉÌÎª0
-        //Òò´ËÔÚ×îÖÕÎª0Ö®Ç°¾Í×éÖ¯¼ÌĞø»®·Ö£¬²¢¸üĞÂlayerÖµ
+        //é˜²æ­¢threads^layerè¿‡å¤§ï¼Œå¯¼è‡´æœ€ç»ˆçš„å•†ä¸º0
+        //å› æ­¤åœ¨æœ€ç»ˆä¸º0ä¹‹å‰å°±ç»„ç»‡ç»§ç»­åˆ’åˆ†ï¼Œå¹¶æ›´æ–°layerå€¼
         if(SimpleBigint(0,0)==tmp){
             #ifdef _LAYERS_MODEXP_DEBUG
             cout<<"INFO: layer changed: from "<<layer<<"to "<<i<<endl;
@@ -32,13 +32,13 @@ void LayersModexp::huafenKrsnum_min(){
             // cerr<<"exp="<<exp<<",threads="<<threads<<",layers="<<layer<<endl;
             //return;
         }
-
+        
         #ifdef _LAYERS_MODEXP_DEBUG
         cout<<"the tmp is:"<<tmp<<",shengyu is"<<shengyu;
         cout<<endl;
         #endif // _LAYERS_MODEXP_DEBUG
     }
-    //µÃµ½×îºóµÄÉÌ£¨Èç¹ûÃ»ÓĞ¸üĞÂlayer£¬¾ÍÒâÎ¶×ÅÉÌ²»ÊÇ0£¬ĞèÒª´æ´¢ÏÂÀ´
+    //å¾—åˆ°æœ€åçš„å•†ï¼ˆå¦‚æœæ²¡æœ‰æ›´æ–°layerï¼Œå°±æ„å‘³ç€å•†ä¸æ˜¯0ï¼Œéœ€è¦å­˜å‚¨ä¸‹æ¥
     if(!(SimpleBigint(0,0)==tmp)){
         // cerr<<"thread^layer is too large, decrease layer or thread!"<<endl;
         // cerr<<"exp="<<exp<<",threads="<<threads<<",layers="<<layer<<endl;
@@ -53,7 +53,7 @@ void LayersModexp::huafenKrsnum_min(){
         cout<<endl;
         #endif // _LAYERS_MODEXP_DEBUG
     }
-
+    
 }
 void LayersModexp::huafenKrsnum_max(unsigned mul){
     #ifdef _LAYERS_MODEXP_DEBUG
@@ -80,8 +80,8 @@ void LayersModexp::huafenKrsnum_max(unsigned mul){
         krsnum.push_back(shengyu);
         krsvalue.push_back(SimpleBigint(0,0));
         tmp=tmps;
-        //·ÀÖ¹threads^layer¹ı´ó£¬µ¼ÖÂ×îÖÕµÄÉÌÎª0
-        //Òò´ËÔÚ×îÖÕÎª0Ö®Ç°¾Í×éÖ¯¼ÌĞø»®·Ö£¬²¢¸üĞÂlayerÖµ
+        //é˜²æ­¢threads^layerè¿‡å¤§ï¼Œå¯¼è‡´æœ€ç»ˆçš„å•†ä¸º0
+        //å› æ­¤åœ¨æœ€ç»ˆä¸º0ä¹‹å‰å°±ç»„ç»‡ç»§ç»­åˆ’åˆ†ï¼Œå¹¶æ›´æ–°layerå€¼
         if(SimpleBigint(0,0)==tmp){
            #ifdef _LAYERS_MODEXP_DEBUG
             cout<<"INFO: layer changed: from "<<layer<<"to "<<i<<endl;
@@ -91,7 +91,7 @@ void LayersModexp::huafenKrsnum_max(unsigned mul){
             }
             cout<<endl;
            #endif // _LAYERS_MODEXP_DEBUG
-
+            
             layer=i;
             break;
             // cerr<<"thread^layer is too large, decrease layer or thread!"<<endl;
@@ -103,7 +103,7 @@ void LayersModexp::huafenKrsnum_max(unsigned mul){
         cout<<endl;
         #endif // _LAYERS_MODEXP_DEBUG
     }
-    //µÃµ½×îºóµÄÉÌ£¨Èç¹ûÃ»ÓĞ¸üĞÂlayer£¬¾ÍÒâÎ¶×ÅÉÌ²»ÊÇ0£¬ĞèÒª´æ´¢ÏÂÀ´
+    //å¾—åˆ°æœ€åçš„å•†ï¼ˆå¦‚æœæ²¡æœ‰æ›´æ–°layerï¼Œå°±æ„å‘³ç€å•†ä¸æ˜¯0ï¼Œéœ€è¦å­˜å‚¨ä¸‹æ¥
     if(!(SimpleBigint(0,0)==tmp)){
         // cerr<<"thread^layer is too large, decrease layer or thread!"<<endl;
         // cerr<<"exp="<<exp<<",threads="<<threads<<",layers="<<layer<<endl;
@@ -118,17 +118,17 @@ void LayersModexp::huafenKrsnum_max(unsigned mul){
         cout<<endl;
         #endif // _LAYERS_MODEXP_DEBUG
     }
-
+    
 }
 
 void LayersModexp::layersmodexp_min(){
-    //assignÔÚÍâÃæ×ö
+    //assignåœ¨å¤–é¢åš
     if(krsnum.size()!=layer){
         cerr<<"wrong in assignment, try again."<<endl;
         cmexp=SimpleBigint(0,0);
         return;
     }
-    //ÕÒ×î´óÖµ
+    //æ‰¾æœ€å¤§å€¼
     SimpleBigint maxi(0,0);
     for(unsigned i=0;i<layer;++i){
         if(krsnum[i]>maxi)maxi=krsnum[i];
@@ -149,7 +149,7 @@ void LayersModexp::layersmodexp_min(){
     #endif
     SimpleBigint resr=cmr;
     unsigned j=0;
-    //½«ÄÇĞ©²»ĞèÒªÄ£³ËµÄÌá³öÀ´
+    //å°†é‚£äº›ä¸éœ€è¦æ¨¡ä¹˜çš„æå‡ºæ¥
     for(auto it=krsnum.begin();it!=krsnum.end();++j,++it){
         if(SimpleBigint(1,0)==*(it)){
             krsvalue[j]=resr;
@@ -160,14 +160,14 @@ void LayersModexp::layersmodexp_min(){
             //break;
         }
     }
-    //½øĞĞ¼ÆËã£ºÖ»¼ÆËã×î´óÖ¸ÊıĞèÒªµÄ£¬ÆäËûµÄ¿ÉÒÔÔÚ¹ı³ÌÖĞ½øĞĞÌî³ä
+    //è¿›è¡Œè®¡ç®—ï¼šåªè®¡ç®—æœ€å¤§æŒ‡æ•°éœ€è¦çš„ï¼Œå…¶ä»–çš„å¯ä»¥åœ¨è¿‡ç¨‹ä¸­è¿›è¡Œå¡«å……
     for(SimpleBigint i(2,0);maxi>=i;i+=SimpleBigint(1,0)){
         resr=mym.myMontgomeryMul(resr,cmr);
         #ifdef _LAYERS_MODEXP_DEBUG
         //cout<<"in exptmp="<<i<<", the resr is:"<<resr<<endl;
         #endif
         j=0;
-        //Ñ°ÕÒÊÇ²»ÊÇÓĞ¿ÉÒÔÌî³äµÄ
+        //å¯»æ‰¾æ˜¯ä¸æ˜¯æœ‰å¯ä»¥å¡«å……çš„
         for(auto it=krsnum.begin();it!=krsnum.end();++j,++it){
             if(i==*(it)){
                 krsvalue[j]=resr;
@@ -193,7 +193,7 @@ void LayersModexp::layersmodexp_min(){
     }
     cout<<endl;
     #endif
-    //ÏÖÔÚ¿ªÊ¼×îºóµÄºÏ²¢£º
+    //ç°åœ¨å¼€å§‹æœ€åçš„åˆå¹¶ï¼š
     SimpleBigint tmp(krsvalue[layer-1]);
     for(unsigned i=1;i<layer;++i){
         for(unsigned j=1;j<threads;++j){
@@ -207,7 +207,7 @@ void LayersModexp::layersmodexp_min(){
         }
         if(!(krsvalue[layer-1-i]==SimpleBigint(0,0)))
             tmp=mym.myMontgomeryMul(tmp,krsvalue[layer-1-i]);
-        krsvalue[layer-1]=tmp;//¸üĞÂ
+        krsvalue[layer-1]=tmp;//æ›´æ–°
     }
     cmexp=mym.myMontgomeryMul(tmp,cmexp);
     noreduce=cmexp%mod;
@@ -229,13 +229,13 @@ void LayersModexp::layersmodexp_min(){
 
 
 void LayersModexp::layersmodexp_max(unsigned mul){
-    //assignÔÚÍâÃæ×ö
+    //assignåœ¨å¤–é¢åš
     if(krsnum.size()!=layer){
         cerr<<"wrong in assignment, try again."<<endl;
         cmexp=SimpleBigint(0,0);
         return;
     }
-    //ÕÒ×î´óÖµ
+    //æ‰¾æœ€å¤§å€¼
     // SimpleBigint maxi(0,0);
     // for(unsigned i=0;i<layer;++i){
     //     if(krsnum[i]>maxi)maxi=krsnum[i];
@@ -250,7 +250,7 @@ void LayersModexp::layersmodexp_max(unsigned mul){
     #endif
     SimpleBigint resr=cmr;
     unsigned j=0;
-    //½«ÄÇĞ©²»ĞèÒªÄ£³ËµÄÌá³öÀ´
+    //å°†é‚£äº›ä¸éœ€è¦æ¨¡ä¹˜çš„æå‡ºæ¥
     for(auto it=krsnum.begin();it!=krsnum.end();++j,++it){
         if(SimpleBigint(1,0)==*(it)){
             krsvalue[j]=resr;
@@ -261,7 +261,7 @@ void LayersModexp::layersmodexp_max(unsigned mul){
             //break;
         }
     }
-    //½øĞĞ¼ÆËã£ºÖğ¸öµ÷ÓÃ¸üĞ¡µÄ
+    //è¿›è¡Œè®¡ç®—ï¼šé€ä¸ªè°ƒç”¨æ›´å°çš„
     for(unsigned i=0;i<layer;++i){
         if(!((krsnum[i]==SimpleBigint(1,0))||(krsnum[i]==SimpleBigint(0,0)))){
             #ifdef _LAYERS_MODEXP_DEBUG
@@ -283,7 +283,7 @@ void LayersModexp::layersmodexp_max(unsigned mul){
 
     //     resr=mym.myMontgomeryMul(resr,cmr);
     //     j=0;
-    //     //Ñ°ÕÒÊÇ²»ÊÇÓĞ¿ÉÒÔÌî³äµÄ
+    //     //å¯»æ‰¾æ˜¯ä¸æ˜¯æœ‰å¯ä»¥å¡«å……çš„
     //     for(auto it=krsnum.begin();it!=krsnum.end();++j,++it){
     //         if(i==*(it)){
     //             krsvalue[j]=resr;
@@ -311,7 +311,7 @@ void LayersModexp::layersmodexp_max(unsigned mul){
     }
     cout<<endl;
     #endif
-    //ÏÖÔÚ¿ªÊ¼×îºóµÄºÏ²¢£º
+    //ç°åœ¨å¼€å§‹æœ€åçš„åˆå¹¶ï¼š
     SimpleBigint tmp(0,0);
     SimpleBigint t(1,mul);
     SimpleBigint sp(1,0);
@@ -326,7 +326,7 @@ void LayersModexp::layersmodexp_max(unsigned mul){
         if(!(krsnum[layer-1-i]==SimpleBigint(0,0))){
             tmp=lme.cmexp;//noreduce%mod;
             tmp=tmp*krsvalue[layer-1-i]%mod;
-            krsvalue[layer-1]=tmp;//¸üĞÂ
+            krsvalue[layer-1]=tmp;//æ›´æ–°
         }else{
             tmp=lme.cmexp;
             krsvalue[layer-1]=tmp;

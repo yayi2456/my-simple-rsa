@@ -2,9 +2,6 @@
 #define _CRT_RSA
 #include"layersModexp.h"
 #include"quickModexp.h"
-#ifdef _OPEN_OPENMP_
-#include<omp.h>
-#endif
 class CrtRSA{
     SimpleBigint p;
     SimpleBigint q;
@@ -18,10 +15,10 @@ public:
     //SimpleBigint phin;
     //bool checkEqual(SimpleBigint m);
     bool generateKey(unsigned length=2048);
-    //·Ö²ãµÄ¼ÓÃÜºÍ½âÃÜº¯Êı
+    //åˆ†å±‚çš„åŠ å¯†å’Œè§£å¯†å‡½æ•°
     SimpleBigint encryptme_layers(SimpleBigint m,unsigned threads=4,unsigned layers=1);
     SimpleBigint decryptme_layers(SimpleBigint c,unsigned threads=4,unsigned layers=1);
-    //¿ìËÙÄ£Ãİ¼ÓÃÜ½âÃÜ
+    //å¿«é€Ÿæ¨¡å¹‚åŠ å¯†è§£å¯†
     SimpleBigint encryptme_quick(SimpleBigint m);
     SimpleBigint decryptme_quick(SimpleBigint m);
 };

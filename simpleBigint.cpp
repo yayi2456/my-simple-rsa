@@ -18,33 +18,21 @@ SimpleBigint::SimpleBigint(const uint64_t num,unsigned mulsize){
     numbers.push_back(lowbits);
     if(highbits)numbers.push_back(highbits);
 }
-SimpleBigint::SimpleBigint(void*num){
-    uint32_t lengthme;
-    memcpy(&lengthme,num,sizeof(uint32_t));
-    //cout<<"SIMPLEBIGINT-length="<<lengthme<<endl;
-    int position=sizeof(uint32_t);
-    for(int i=0;i<(int)lengthme;++i){
-        int tmp;
-        memcpy(&tmp,num+position,sizeof(uint32_t));
-        numbers.push_back(tmp);
-        position+=sizeof(uint32_t);
-        //cout<<"SIMPLEBIGINT-tmp"<<i<<"/"<<lengthme<<" ="<<tmp<<endl;
-    }
-}
+
 
 void SimpleBigint::getfromString(string num){
     numbers.clear();
     int base=16;
     int elementsize=32,stepsize=elementsize/4;//8
     int numsize=num.length();
-    //Ð¡¶Ë·½Ê½´æ´¢£ºnumbers[0]ÊÇ×îµÍµÄ8¸ö×ÖÄ¸
+    //å°ç«¯æ–¹å¼å­˜å‚¨ï¼šnumbers[0]æ˜¯æœ€ä½Žçš„8ä¸ªå­—æ¯
     int i=numsize-stepsize;
     for(;i>=0;i-=stepsize){
         uint32_t tmp=strtoul(num.substr(i,stepsize).c_str(),nullptr,base);
         numbers.push_back(tmp);
     }
     int j=numsize%stepsize;
-    if(j==0)return;//´¦Àí½áÊø
+    if(j==0)return;//å¤„ç†ç»“æŸ
     else{
         uint32_t tmp=strtoul(num.substr(0,j).c_str(),nullptr,base);
         numbers.push_back(tmp);
@@ -117,7 +105,7 @@ SimpleBigint SimpleBigint::operator*(const SimpleBigint&bigint2)const{
     SimpleBigint ret;
     for(it1=numbers.begin();it1!=numbers.end();++it1){
         for(it2=bigint2.numbers.begin();it2!=bigint2.numbers.end();++it2){
-            //ÐèÒªÏòÇ°ÒÆ²½¶àÉÙ¸öÎ»ÖÃ
+            //éœ€è¦å‘å‰ç§»æ­¥å¤šå°‘ä¸ªä½ç½®
             unsigned mulsize=((unsigned)(it1-numbers.begin())+(unsigned)(it2-bigint2.numbers.begin()));
             uint64_t tmp=(uint64_t)(*it1)*(*it2);
             SimpleBigint btmp(tmp,mulsize);
@@ -149,8 +137,8 @@ SimpleBigint SimpleBigint::operator-(const SimpleBigint& bigint2)const{
     c-=bigint2;
     return c;
 }
-//²»¿¼ÂÇ¸ºÊý/0
-//¼´£ºthis>bigint2
+//ä¸è€ƒè™‘è´Ÿæ•°/0
+//å³ï¼šthis>bigint2
 SimpleBigint& SimpleBigint::operator-=(const SimpleBigint&bigint2){
     if(bigint2>=(*this)){
         *this=SimpleBigint();
@@ -353,7 +341,7 @@ int SimpleBigint::numbersLength()const{
 }
 uint32_t SimpleBigint::getbyIndex(unsigned index)const{
     if(numbers.size()<=index || index<0){
-            return 0;//Ô½½ç
+            return 0;//è¶Šç•Œ
     }
     else{
         return numbers[index];
@@ -394,45 +382,20 @@ SimpleBigint SimpleBigint::moveby2_divide(int num){
         }
         res.numbers.erase(it);
     }
-    ///
-/*    if((*res.numbers.begin())%(int)pow(2,elementsinside)!=0){
+    if((*res.numbers.begin())%(int)pow(2,elementsinside)!=0){
         cerr<<"error!!!!!!!!!!!!!!!!:"<<elementsinside<<endl;
-    }*/
-    unsigned maskallone=0xFFFFFFFF;
-    unsigned maskres;
-    //cout<<hex<<fixed << setw(8) << setfill('0')<<(maskallone>>32)<<endl;
- /*   if((res.numbers[0])%((uint32_t)pow(2,elementsinside))!=((res.numbers[0])&(maskallone>>(32-elementsinside)))){
-        //cout<<"pow\n"<<hex<<fixed << setw(8) << setfill('0')<<(res.numbers[0])%((uint32_t)pow(2,elementsinside))<<endl<<((res.numbers[0])&(maskallone>>(32-elementsinside)))<<endl;
-        //cout<<"pow\n"<<hex<<fixed << setw(8) << setfill('0')<<((uint32_t)pow(2,elementsinside))<<endl<<(maskallone>>(32-elementsinside))<<endl<<res.numbers[0]<<endl<<elementsinside<<endl;;
-        cout<<"elemengsize="<<elementsinside<<endl<<"masknuo="<<maskres<<endl<<"mask="<<((res.numbers[0])&(maskallone>>(32-elementsinside)))<<endl;
-        cout<<"xp="<<(32-elementsinside)<<endl;
-    }*/
-    ////=========
-    if(elementsinside==0){
-        maskres=0;
-    }else{
-        maskres=maskallone>>(32-elementsinside);
     }
-    if(((res.numbers[0])&maskres)!=0){
-        cerr<<"error!!!!!!!!!!!!!!!!:>>>"<<elementsinside<<endl;
-    }
-    ///
-
     uint32_t out=0;
-    uint32_t mask=(0xffffffff>>(32-elementsinside));//
     for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
         uint32_t  out2=(*it)%(int)pow(2,elementsinside);//cout<<"out:"<<out<<endl;
-        //uint32_t out2=(*it)&mask;
         (*it)>>=elementsinside;//cout<<"(*it)"<<(*it)<<endl;
-        //(*it)=(*it)|(out<<(32-elementsinside));
         (*it)+=out<<(32-elementsinside);//cout<<"(*it)"<<(*it)<<endl;
         out=out2;
     }
-    /*for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
+    for(auto it=res.numbers.end()-1;it!=res.numbers.begin()-1;--it){
         if((*it)!=0)break;
         res.numbers.erase(it);
-    }*/
-    res.trimnumber();
+    }
     return res;
 }
 void SimpleBigint::trimnumber(){
@@ -442,39 +405,3 @@ void SimpleBigint::trimnumber(){
         else break;
     }
 }
-#ifndef _OPENMP_MOVE_MUL
-SimpleBigint SimpleBigint::moveby2_mul(){
-    numbers.push_back(0);
-    uint32_t overflow=0;
-    for(int i=0;i<numbers.size();++i){
-        uint32_t mask=0x80000000;
-        uint32_t thisoverflow=((numbers[i]&mask)==0)?0:1;
-        numbers[i]<<=1;
-        numbers[i]+=overflow;
-        overflow=thisoverflow;
-    }
-    trimnumber();
-    return *this;
-}
-#else
-SimpleBigint SimpleBigint::moveby2_mul(){
-    numbers.push_back(0);
-    uint32_t overflow[numbers.size()];
-    uint32_t mask=0x80000000;//numÔö¼Ó£¬Ê±¼äÔö¼Ó
-    #pragma omp parallel num_threads(1)
-    {
-    #pragma omp for
-    for(int i=0;i<numbers.size();++i){
-        overflow[i]=((numbers[i]&mask)==0)?0:1;
-        numbers[i]<<=1;
-    }
-    #pragma omp for
-    for(int i=1;i<numbers.size();++i){
-        numbers[i]+=overflow[i-1];
-    }
-    }
-
-    trimnumber();
-    return *this;
-}
-#endif

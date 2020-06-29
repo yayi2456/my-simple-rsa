@@ -1,12 +1,11 @@
 #include"crtRSA.h"
 //#define _CRT_RSA_DEBUG
-//#define _TEST_TIME_CRT_RSA
 /*
-opensslÊ¹ÓÃ·½Ê½£ºhttps://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
-¸ü¶àÉú³ÉÊı¾İÓëËµÃ÷²Î¼ûÎÄ¼şothers/openssl_rsadata.txt
+opensslä½¿ç”¨æ–¹å¼ï¼šhttps://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
+æ›´å¤šç”Ÿæˆæ•°æ®ä¸è¯´æ˜å‚è§æ–‡ä»¶others/openssl_rsadata.txt
 */
 bool CrtRSA::generateKey(unsigned length){
-    /*Ê¹ÓÃopensslÉú³ÉµÄÃÜÔ¿´úÌæ*/
+    /*ä½¿ç”¨opensslç”Ÿæˆçš„å¯†é’¥ä»£æ›¿*/
     //cout<<"generating keys with length= 0X"<<length<<endl;
     switch(length){
         case 512:
@@ -77,8 +76,8 @@ SimpleBigint CrtRSA::decryptme_layers(SimpleBigint c,unsigned threads,unsigned l
     lmeq.huafenKrsnum_max(1);
     lmeq.layersmodexp_max(1);
     SimpleBigint lmepbig=lmep.cmexp;
-    //ÒòÎªÊµÏÖµÄ´óÊıÀàÎŞ·¨´¦Àí¸ºÊı£¬
-    //ÏÈ°Ñ¿ÉÄÜÊÇ¸ºÊıµÄ¶«Î÷¸Ä³ÉÕıÊı
+    //å› ä¸ºå®ç°çš„å¤§æ•°ç±»æ— æ³•å¤„ç†è´Ÿæ•°ï¼Œ
+    //å…ˆæŠŠå¯èƒ½æ˜¯è´Ÿæ•°çš„ä¸œè¥¿æ”¹æˆæ­£æ•°
     while(lmeq.cmexp>lmepbig){
         lmepbig+=p;
     }
@@ -107,55 +106,20 @@ SimpleBigint CrtRSA::encryptme_quick(SimpleBigint m){
     return qme.cmexp;
 }
 SimpleBigint CrtRSA::decryptme_quick(SimpleBigint c){
-    #ifdef _TEST_TIME_CRT_RSA
-    long long head,freq,tail;
-    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
-    #endif
-    #ifndef _OPEN_OPENMP_
     SimpleBigint cp=c%p;
     SimpleBigint cq=c%q;
-    QuickModExp qmep(cp,dp,p);
+    QuickModExp qmep(cp,dp,n);
     qmep.quickmodexp();
-    QuickModExp qmeq(cq,dq,q);
+    QuickModExp qmeq(cq,dq,n);
     qmeq.quickmodexp();
-    #else
-    //¿´ÆğÀ´ÊÇ»ÒÉ«£¬Êµ¼ÊÉÏÊÇÔÚÍ·ÎÄ¼şÀïÃæ¶¨ÒåÁËßÕ£¡
-    //cout<<"openmp"<<endl;
-    SimpleBigint cp,cq;
-    QuickModExp qmep,qmeq;
-    #pragma omp parallel for
-    for(int i=0;i<2;++i){
-        if(i==0){
-            cp=c%p;
-            qmep.initQuick(cp,dp,p);
-            qmep.quickmodexp();
-        }else{
-            cq=c%q;
-            qmeq.initQuick(cq,dq,q);
-            qmeq.quickmodexp();
-        }
-    }
-    #endif
-    #ifdef _TEST_TIME_CRT_RSA
-    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-    double intervel=(tail-head)*1000.0/freq;
-    cout<<"in crtRSA-decrypt-loop, time used="<<intervel<<" ms"<<endl;
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
-    #endif
     SimpleBigint qmepbig=qmep.cmexp;
-    //ÒòÎªÊµÏÖµÄ´óÊıÀàÎŞ·¨´¦Àí¸ºÊı£¬
-    //ÏÈ°Ñ¿ÉÄÜÊÇ¸ºÊıµÄ¶«Î÷¸Ä³ÉÕıÊı
+    //å› ä¸ºå®ç°çš„å¤§æ•°ç±»æ— æ³•å¤„ç†è´Ÿæ•°ï¼Œ
+    //å…ˆæŠŠå¯èƒ½æ˜¯è´Ÿæ•°çš„ä¸œè¥¿æ”¹æˆæ­£æ•°
     while(qmeq.cmexp>qmepbig){
         qmepbig+=p;
     }
     SimpleBigint h=(((qmepbig-qmeq.cmexp))*q_1)%p;
     SimpleBigint m=(qmeq.cmexp+h*q)%n;
-    #ifdef _TEST_TIME_CRT_RSA
-    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-    intervel=(tail-head)*1000.0/freq;
-    cout<<"in crtRSA-decrypt-exit, time used="<<intervel<<" ms"<<endl;
-    #endif
     #ifdef _CRT_RSA_DEBUG
     cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
     cout<<"the cp="<<cp<<"\ncq="<<cq<<endl;

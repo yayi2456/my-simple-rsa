@@ -3,80 +3,50 @@
 
 #include"simpleBigint.h"
 #include<math.h>
-#include <immintrin.h>
 #include<cstring>
-#include<windows.h>
-#include"bigintAdd.h"
-//R=(2^32)^M£¬M=B.size()-1£¬£¨Èç¹ûÒª·Ö½âBµÄ»°£¬ÎÒÃÇ¾Í·Ö½âB£©
-//ÆäÖĞ
+//#include<windows.h>
+//R=(2^32)^Mï¼ŒM=B.size()-1ï¼Œï¼ˆå¦‚æœè¦åˆ†è§£Bçš„è¯ï¼Œæˆ‘ä»¬å°±è§„å®šåˆ†è§£Bï¼‰
+
+//MyMontgomery ç±»ï¼Œç”¨æ¥åšå¤§æ•°çš„æ¨¡å¹‚è¿ç®—
 class MyMontgomery{
 public:
     unsigned r_exp=32;
-    SimpleBigint A;//´óÊıa
-    SimpleBigint B;//´óÊıb
-    SimpleBigint N;//´óÊın£ºÄ£Êı
-    SimpleBigint R;//´óÊır£º½øÖÆ¡£
+    SimpleBigint A;//å¤§æ•°a
+    SimpleBigint B;//å¤§æ•°b
+    SimpleBigint N;//å¤§æ•°nï¼šæ¨¡æ•°
+    SimpleBigint R;//å¤§æ•°rï¼šè¿›åˆ¶ã€‚
     SimpleBigint R2modN;
     SimpleBigint N_1;
     MyMontgomery(SimpleBigint a,SimpleBigint b,SimpleBigint n):
-        A(a),B(b),N(n),R(1,b.numbers.size()-1)//R=2^32£¬ÕâÓÉ´óÊı±íÊ¾·¨È·¶¨£¬ÈİÒ×¼ÆËã
+        A(a),B(b),N(n),R(1,b.numbers.size()-1)//R=2^32ï¼Œè¿™ç”±å¤§æ•°è¡¨ç¤ºæ³•ç¡®å®šï¼Œå®¹æ˜“è®¡ç®—
         {R2modN=calR2modN();N_1=calN_1();}
     MyMontgomery()=default;
     void initMontgomery(SimpleBigint a,SimpleBigint b,SimpleBigint n){
-        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
-        long long head,freq,tail,headb,tailb;
-        QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq);
-        QueryPerformanceCounter((LARGE_INTEGER*)&headb);
-        #endif
         A=a;
         B=b;
         N=n;
         R.getfromuint32(1,b.numbers.size()-1);
-        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
-        QueryPerformanceCounter((LARGE_INTEGER*)&head);
-        #endif
         R2modN=calR2modN();
-        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
-        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-        double intervel=(tail-head)*1000.0/freq;
-        cout<<"in mym-calr2modn, time used="<<intervel<<" ms"<<endl;
-        QueryPerformanceCounter((LARGE_INTEGER*)&head);
-        #endif
         N_1=calN_1();
-        #ifdef _TEST_TIME_SIMPLE_MONTGOMERY_
-        QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-        intervel=(tail-head)*1000.0/freq;
-        cout<<"in mym-caln1, time used="<<intervel<<" ms"<<endl;
-        QueryPerformanceCounter((LARGE_INTEGER*)&tailb);
-        intervel=(tailb-headb)*1000.0/freq;
-        cout<<"in mym-mym-all, time used="<<intervel<<" ms"<<endl;
-        #endif
     }
-    //Î¨Ò»ĞèÒª³ı·¨È¡Ä£¼ÆËãµÄº¯Êı£¬Ô¤ÏÈ¼ÆËã
-    //¼ÆËãR^2 mod N
+    //å”¯ä¸€éœ€è¦é™¤æ³•å–æ¨¡è®¡ç®—çš„å‡½æ•°ï¼Œé¢„å…ˆè®¡ç®—
+    //è®¡ç®—R^2 mod N
     SimpleBigint calR2modN();
-    //¼ÆËãN^{-1}£¬Ê¹µÃN*N^{-1}= -1 mod N£¬Ê¹ÓÃºàÔó¶ûÒıÀí¼ÆËã
+    //è®¡ç®—N^{-1}ï¼Œä½¿å¾—N*N^{-1}= -1 mod Nï¼Œä½¿ç”¨äº¨æ³½å°”å¼•ç†è®¡ç®—
     SimpleBigint calN_1();
-    //¼ÆËãAR»òBR£¬¸ù¾İ²ÎÊıÑ¡Ôñ£¬Èç¹ûisAÎªÕæ£¬¼ÆËãAR£¬·ñÔò¼ÆËãBR
+    //è®¡ç®—ARæˆ–BRï¼Œæ ¹æ®å‚æ•°é€‰æ‹©ï¼Œå¦‚æœisAä¸ºçœŸï¼Œè®¡ç®—ARï¼Œå¦åˆ™è®¡ç®—BR
     SimpleBigint myMontgomeryTo(bool isA=true);
-    //³Ë·¨¼ÆËã¹ı³Ì
+    //ä¹˜æ³•è®¡ç®—è¿‡ç¨‹
     //return AR*BR*R^{-1} mod N
     SimpleBigint myMontgomeryMul( SimpleBigint&AR, SimpleBigint&BR);
     //reduction
     //return S=ResR*R^{-1} mod N
     SimpleBigint myMontgomeryReduction(SimpleBigint ResR);
-    //SIMD³ÌĞò
-    SimpleBigint simdMontgomeryMul(SimpleBigint&AR, SimpleBigint&BR);
-    SimpleBigint simdMontgomeryMul_avx256(SimpleBigint&AR, SimpleBigint&BR);
 
 };
-//extern SimpleBigint R2modN;
-//n=2^32
-//a=x0
 
-//¼ÆËãx_0^-1£¬Ê¹µÃx*x^{-1}=1 mod R£¬Ê¹ÓÃÀ©Õ¹Å·¼¸ÀïµÃ¼ÆËã
-    //ÆäÖĞx_0ÊÇ32bitsµÄ¶ş½øÖÆÊı
+//extendEuclideanx0_1_32 æ‰©å±•çš„æ¬§å‡ é‡Œå¾—ç®—æ³•ï¼Œ
+//è®¡ç®—x_0^-1ï¼Œä½¿å¾—x*x^{-1}=1 mod Rï¼Œ
+//å…¶ä¸­x_0æ˜¯32bitsçš„äºŒè¿›åˆ¶æ•°
 uint32_t extendEuclideanx0_1_32(uint32_t x0);
-//ĞŞ¸Ä°æº¯Êı
-SimpleBigint simdMulBig_32(SimpleBigint X,uint32_t y0);
 #endif // _SIMPLE_MONTGOMERY_

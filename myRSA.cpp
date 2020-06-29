@@ -1,13 +1,12 @@
-#include"simpleRSA.h"
-//#define _SIMPLE_RSA_DEBUG
-#define _TEST_TIME_SIMPLE_RSA
-/*
-opensslÊ¹ÓÃ·½Ê½£ºhttps://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
-¸ü¶àÉú³ÉÊı¾İÓëËµÃ÷²Î¼ûÎÄ¼şothers/openssl_rsadata.txt
+#include"myRSA.h"
+//#define _MY_RSA_DEBUG
+/* 
+opensslä½¿ç”¨æ–¹å¼ï¼šhttps://chuyao.github.io/2017/09/07/openssl-1-rsa-key/
+æ›´å¤šç”Ÿæˆæ•°æ®ä¸è¯´æ˜å‚è§æ–‡ä»¶others/openssl_rsadata.txt
 */
-bool SimpleRSA::generateKey(unsigned length){
-    /*Ä¿Ç°ÉĞÎŞÃÜÔ¿Éú³É´úÂë£¬
-    Ê¹ÓÃopensslÉú³ÉµÄÃÜÔ¿´úÌæ*/
+bool MyRSA::generateKey(unsigned length){
+    /*æœªå†™å‡ºå¯†é’¥ç”Ÿæˆä»£ç ï¼Œ
+    ä½¿ç”¨ä½¿ç”¨äº†opensslç”Ÿæˆçš„å¯†é’¥ä»£æ›¿*/
     //cout<<"generating keys with length= 0X"<<length<<endl;
     switch(length){
         case 512:
@@ -35,137 +34,89 @@ bool SimpleRSA::generateKey(unsigned length){
             cerr<<"wrong length"<<endl;
             return false;
     }
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"keys generated successfully"<<endl;
     #endif
     return true;
 }
-SimpleBigint SimpleRSA::encryptme(SimpleBigint m){
+SimpleBigint MyRSA::encryptme(SimpleBigint m){
     SimpleModExp sme(m,e,n);
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"doning encrypt...\nm="<<m<<"\ne="<<e<<"\nn="<<n<<endl;
     #endif
     sme.modexp();
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"encrypt done with \nC="<<sme.cmexp<<endl;
-    #endif
-    return sme.cmexp;
-}
-SimpleBigint SimpleRSA::simdencryptme(SimpleBigint m){
-    SimpleModExp sme(m,e,n);
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"doning encrypt... \nm="<<m<<"\ne="<<e<<"\nn="<<n<<endl;
-    #endif
-    sme.simdmodexp();
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"encrypt done with \nC="<<sme.cmexp<<endl;
     #endif
     return sme.cmexp;
 }
 
-SimpleBigint SimpleRSA::encryptme_layers(SimpleBigint m,unsigned threads,unsigned layers){
+SimpleBigint MyRSA::decryptme(SimpleBigint c){
+    SimpleModExp sme(c,d,n);
+    #ifdef _MY_RSA_DEBUG
+    cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
+    #endif
+    sme.modexp();
+    #ifdef _MY_RSA_DEBUG
+    cout<<"decrypt done with \nM="<<sme.cmexp<<endl;
+    #endif
+    return sme.cmexp;
+}
+
+SimpleBigint MyRSA::encryptme_layers(SimpleBigint m,unsigned threads,unsigned layers){
     LayersModexp lme(m,e,n);
     lme.setThreadandLayer(threads,layers);
     lme.huafenKrsnum_min();
 
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"doning encrypt...\nm="<<m<<"\ne="<<e<<"\nn="<<n<<endl;
     #endif
     lme.layersmodexp_min();
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"encrypt done with \nC="<<lme.cmexp<<endl;
     #endif
     return lme.cmexp;
 }
 
 
-SimpleBigint SimpleRSA::decryptme_layers(SimpleBigint c,unsigned threads,unsigned layers){
+SimpleBigint MyRSA::decryptme_layers(SimpleBigint c,unsigned threads,unsigned layers){
     LayersModexp lme(c,d,n);
     lme.setThreadandLayer(threads,layers);
     lme.huafenKrsnum_max(1);
 
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
     #endif
     lme.layersmodexp_max(1);
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"decrypt done with \nM="<<lme.cmexp<<endl;
     #endif
     return lme.cmexp;
 }
-
-SimpleBigint SimpleRSA::encryptme_layers_multi(SimpleBigint m,unsigned threads,unsigned layers){
-    ThreadLayersModexp lme(m,e,n);
-    lme.setThreadandLayer(threads,layers);
-    lme.huafenKrsnum_min();
-
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"doning encrypt...\nm="<<m<<"\ne="<<e<<"\nn="<<n<<endl;
-    #endif
-    lme.layersmodexp_min();
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"encrypt done with \nC="<<lme.cmexp<<endl;
-    #endif
-    return lme.cmexp;
-}
-SimpleBigint SimpleRSA::decryptme_layers_multi(SimpleBigint c,unsigned threads,unsigned layers){
-    ThreadLayersModexp lme(c,d,n);
-    lme.setThreadandLayer(threads,layers);
-    lme.huafenKrsnum_max(1);
-
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
-    #endif
-    lme.layersmodexp_max(1);
-    #ifdef _SIMPLE_RSA_DEBUG
-    cout<<"decrypt done with \nM="<<lme.cmexp<<endl;
-    #endif
-    return lme.cmexp;
-}
-
-SimpleBigint SimpleRSA::encryptme_quick(SimpleBigint m){
+SimpleBigint MyRSA::encryptme_quick(SimpleBigint m){
     QuickModExp qme(m,e,n);
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"doning encrypt...\nm="<<m<<"\ne="<<e<<"\nn="<<n<<endl;
     #endif
     qme.quickmodexp();
-    #ifdef _SIMPLE_RSA_DEBUG
+    #ifdef _MY_RSA_DEBUG
     cout<<"encrypt done with \nC="<<qme.cmexp<<endl;
     #endif
     return qme.cmexp;
 }
-SimpleBigint SimpleRSA::decryptme_quick(SimpleBigint c){
-    #ifdef _TEST_TIME_SIMPLE_RSA
-    long long head,freq,tail;
-    QueryPerformanceFrequency ( (LARGE_INTEGER*)& freq) ;
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
-    #endif
+SimpleBigint MyRSA::decryptme_quick(SimpleBigint c){
     QuickModExp qme(c,d,n);
-    #ifdef _TEST_TIME_SIMPLE_RSA
-    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-    double intervel=(tail-head)*1000.0/freq;
-    cout<<"in simplersa-quickmoe-init, time used="<<intervel<<" ms"<<endl;
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #ifdef _MY_RSA_DEBUG
+    cout<<"doning decrypt...\nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
     #endif
     qme.quickmodexp();
-    #ifdef _TEST_TIME_SIMPLE_RSA
-    QueryPerformanceCounter((LARGE_INTEGER*)&tail);
-    intervel=(tail-head)*1000.0/freq;
-    cout<<"in simplersa-quickmod-mod, time used="<<intervel<<" ms"<<endl;
-    QueryPerformanceCounter((LARGE_INTEGER*)&head);
+    #ifdef _MY_RSA_DEBUG
+    cout<<"decrypt done with \nM="<<qme.cmexp<<endl;
     #endif
     return qme.cmexp;
 }
 /*
-SimpleBigint SimpleRSA::decryptme(SimpleBigint c){
-    SimpleModExp sme(c,d,n);
-    cout<<"doning decrypt...with \nc="<<c<<"\nd="<<d<<"\nn="<<n<<endl;
-    SimpleBigint M=sme.modexp();
-    cout<<"decrypt done with \nM="<<M<<endl;
-    return M;
-}
-
-bool SimpleRSA::checkEqual(SimpleBigint m){
+bool MyRSA::checkEqual(SimpleBigint m){
     SimpleBigint C=encryptme(m);
     SimpleBigint M=decryptme(C);
     return M==m;
