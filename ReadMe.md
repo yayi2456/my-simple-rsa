@@ -42,7 +42,7 @@ $\verb|myrsa.exe|$允许使用命令行参数指定密钥长度，
 
 <center>
 
-![rsa=512](figures/rsa-512-e.png)
+![rsa=512](figures/rsa-512-e.PNG)
 
 ![rsa=1024](figures/rsa-1024-e.png)
 
